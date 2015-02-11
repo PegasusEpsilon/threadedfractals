@@ -101,8 +101,8 @@ struct GRADIENT *generate_palette (const struct CHANNEL *channels, struct GRADIE
 			/* dx = distance between A and B on the X axis (delta t of [a, b]) */
 			double dx = fmod(1 + channels[c].points[b].x - channels[c].points[a].x, 1.0);
 
-			/* Move forward through the given channels until we
-			 * find one we haven't surpassed yet. Any channels
+			/* Move forward through the given points until we
+			 * find one we haven't surpassed yet. Any points
 			 * we skip entirely are lost in the noise of the
 			 * waveform. Such is the nature of the beast.
 			 */
