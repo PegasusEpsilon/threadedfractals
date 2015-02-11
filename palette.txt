@@ -1,0 +1,11 @@
+# Basic three-phase (RGB) palette specification.
+# Looks a bit like soap film.
+
+LEN 1530
+
+RED 0.0		0	#   0deg, 0
+RED 0.5		1	# 180deg, 1/2
+GRN 0.333333333	0	# 120deg, 1/3
+GRN 0.833333333	1	# 120deg + 180deg = 300deg, 1/3 + 1/2
+BLU 0.666666666 0	# 120deg + 120deg = 240deg, 2/3
+BLU 0.166666666 1	# (240deg + 180deg) % 360deg = 60deg, (2/3 + 1/2) % 1

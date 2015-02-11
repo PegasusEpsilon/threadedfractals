@@ -1,0 +1,9 @@
+old
+*.o
+*.png
+threaded
+threadless
+render
+resample
+pngify
+palette
