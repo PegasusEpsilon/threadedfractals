@@ -11,7 +11,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define new(x) malloc(sizeof(x))
 #define _hot  __attribute__((hot ))	/* called often */
 #define _cold __attribute__((cold))	/* called rarely */
 #define unlikely(x) __builtin_expect(x, 0)
@@ -43,12 +42,12 @@ static inline _hot unsigned long long output (
 	if (write == sequence) {
 		for (;;) {
 			fwrite(data, sizeof(long double), max.real, output_file);
+			fflush(output_file);
 			free(data);
 			if (++write != list_first_index(output_buffer)) break;
 			data = list_pop(output_buffer);
 			--lines_waiting;
 		}
-		fflush(output_file);
 		pthread_cond_broadcast(&data_written);
 	} else {
 		++lines_waiting;
@@ -122,16 +121,19 @@ int main (int argc, char **argv) {
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
 	output_buffer = new_list();
+	queue = malloc(thread_count * sizeof(unsigned long long));
+	pthread_t *threads = malloc(thread_count * sizeof(pthread_t));
 
 	printf("spinning up %llu threads\n", thread_count);
-	queue = malloc(thread_count * sizeof(unsigned long long));
 	pthread_attr_t thread_attributes;
 	pthread_attr_init(&thread_attributes);
-	pthread_attr_setdetachstate(&thread_attributes, PTHREAD_CREATE_DETACHED);
-	pthread_t pointless; /* can't be null */
 	for (render = 0; render < thread_count; render++)
-		pthread_create(&pointless, &thread_attributes, &thread, (void *)render);
+		pthread_create(threads + render, NULL, &thread, (void *)render);
+	for (unsigned long long i = 0; i < thread_count; i++)
+		pthread_join(threads[i], NULL);
+	free(threads);
+	free(queue);
+	list_destroy(output_buffer);
 
-	pthread_exit(0);
 	return 0;
 }
