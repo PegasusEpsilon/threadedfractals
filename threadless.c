@@ -14,58 +14,54 @@
 #define _cold __attribute__((cold))	/* called rarely */
 #define unlikely(x) __builtin_expect(x, 0)
 
-unsigned long long next_write = 0;
-struct pixel max, current;
+struct pixel max;
+unsigned long long render = 0, write;
 
 void display (void) {
-	printf("%llu/%llu (%llu%%)\x1b[K\r", next_write, max.imag, 100 * next_write / max.imag);
+	printf("%llu/%llu (%llu%%)\r", render, max.imag, 100 * render / max.imag);
 	fflush(stdout);
 }
 
-static inline unsigned long long _hot next_line () {
-	if (unlikely(current.imag >= max.imag)) return -1;
-
-	++next_write;
-	unsigned long long copy = current.imag++;
-
-	return copy;
-}
-
 FILE *output_file;
-#define write_buffer(x) fwrite(x, sizeof(long double), max.real, output_file)
-static inline void _hot output (long double *data) {
-	write_buffer(data);
-	fflush(output_file);
+static inline _hot unsigned long long output (long double *data) {
+	fwrite(data, sizeof(long double), max.real, output_file);
 	free(data);
+	fflush(output_file);
+	unsigned long long next = (render == max.imag ? (unsigned long long)-1 : render++);
+	return next;
 }
 
 long double theta;
 long double complex pixelsize;
 struct region viewport;
-static inline void _hot *iterate_line (void) {
+static inline _hot long double *iterate_line (
+	const unsigned long long line
+) {
 	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
-	long double *line = malloc(max.real * sizeof(long double));
-	struct pixel this = { .imag = next_line() };
-	display();
+	long double *buffer = malloc(max.real * sizeof(long double));
+	struct pixel this = { .imag = line };
 
-	if ((unsigned long long)-1 == this.imag) return NULL;
 	for (this.real = 0; this.real < max.real; this.real++) {
 		coordinates.c = pixel2vector(&this, &pixelsize, &viewport, &theta);
-		line[this.real] = sample(&coordinates);
+		buffer[this.real] = sample(&coordinates);
 	}
-	output(line);
-	return NULL;
+	return buffer;
 }
 
-static inline void *persistent_thread (void) {
-	while (unlikely(current.imag < max.imag)) iterate_line();
+static inline void *thread (void *ptr) {
+	unsigned long long thread = (unsigned long long)ptr;
+	while ((unsigned long long)-1 != (
+		thread = output(iterate_line(thread))
+	)) { display(); }
 	return NULL;
 }
 
 __attribute__((noreturn))
 void _cold usage (char *myself) {
 	puts("Threaded Mandelbrot sampler\n");
-	printf("Usage: %s WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
+	printf("Usage: %s THREADS LIMIT WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
+	puts("	THREADS	how many threads to spawn");
+	puts("	LIMIT	max pending writes before threads block");
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
 	puts("	center coordinates (CEN_REAL, CEN_IMAG)");
@@ -93,7 +89,7 @@ int main (int argc, char **argv) {
 
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
-	persistent_thread();
+	thread((void *)render);
 
 	return 0;
 }

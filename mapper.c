@@ -23,11 +23,22 @@ long double complex calculate_pixelsize (
 	);
 }
 
+/* for proper rotation,
+ * you must calculate both coordinates for every pixel.
+ *
+ * caching the difference in coordinates (real and imaginary)
+ * between two consecutive pixels, and adding the difference instead,
+ * will slowly build rounding errors. don't do that either.
+ *
+ * this function shouldn't be a time problem anyway.
+ */
 long double complex pixel2vector (
 	const struct pixel *const in, const long double complex *const size,
 	const struct region *const window, const long double *const theta
 ) {
-	long double complex out = in->real * creall(*size) + in->imag * cimagl(*size) * I - window->radius;
+	long double complex out = in->real * creall(*size)
+	                        + in->imag * cimagl(*size) * I
+	                        - window->radius;
 	if (theta && *theta) out = ( /* rotate if theta */
 		(creall(out) * cosl(*theta) - cimagl(out) * sinl(*theta)) +
 		(creall(out) * sinl(*theta) + cimagl(out) * cosl(*theta)) * I

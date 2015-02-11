@@ -3,7 +3,7 @@ CFLAGS=-g -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 LIBS=-lm
 DIVIDER=1
 THREADS=2
-LIMIT=1000
+LIMIT=10
 MSAA=1
 SIZE_REAL=1920
 SIZE_IMAG=1080
