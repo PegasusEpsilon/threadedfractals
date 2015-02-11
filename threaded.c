@@ -11,7 +11,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define new(x) malloc(sizeof(x))
 #define _hot  __attribute__((hot ))	/* called often */
 #define _cold __attribute__((cold))	/* called rarely */
 #define unlikely(x) __builtin_expect(x, 0)
@@ -67,7 +66,7 @@ static inline _hot long double *iterate_line (
 	const unsigned long long line
 ) {
 	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
-	long double *buffer = malloc(max.real * sizeof(long double));
+	long double *buffer = calloc(max.real, sizeof(long double));
 	struct pixel this = { .imag = line };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
@@ -110,7 +109,7 @@ int main (int argc, char **argv) {
 
 	if (11 > argc) usage(argv[0]);
 
-	thread_count = atoi(argv[1]);
+	render = thread_count = atoi(argv[1]);
 	max_lines_waiting = atoi(argv[2]);
 	max.real = atoi(argv[3]);
 	max.imag = atoi(argv[4]);
@@ -122,16 +121,21 @@ int main (int argc, char **argv) {
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
 	output_buffer = new_list();
+	queue = calloc(thread_count, sizeof(unsigned long long));
+	pthread_t *threads = calloc(thread_count - 1, sizeof(pthread_t));
 
 	printf("spinning up %llu threads\n", thread_count);
-	queue = malloc(thread_count * sizeof(unsigned long long));
-	pthread_attr_t thread_attributes;
-	pthread_attr_init(&thread_attributes);
-	pthread_attr_setdetachstate(&thread_attributes, PTHREAD_CREATE_DETACHED);
-	pthread_t pointless; /* can't be null */
-	for (render = 0; render < thread_count; render++)
-		pthread_create(&pointless, &thread_attributes, &thread, (void *)render);
 
-	pthread_exit(0);
+	unsigned long long i = 0;
+	for (; i < thread_count - 1; i++)
+		pthread_create(threads + i, NULL, &thread, (void *)i);
+	thread((void *)i);
+	while (--i < thread_count) pthread_join(threads[i], NULL);
+
+	free(threads);
+	free(queue);
+	list_destroy(output_buffer);
+	fclose(output_file);
+
 	return 0;
 }
