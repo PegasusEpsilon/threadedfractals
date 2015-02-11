@@ -18,7 +18,7 @@
 unsigned long long lines_waiting = 0, max_lines_waiting;
 unsigned long long thread_count, *queue;
 struct pixel max;
-unsigned long long render = 0, write;
+unsigned long long render, write;
 
 void display (void) {
 	printf("%llu/%llu (%llu%%), queue: ", render, max.imag, 100 * render / max.imag);
