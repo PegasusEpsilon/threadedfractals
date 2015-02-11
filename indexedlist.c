@@ -1,8 +1,7 @@
 #include <stdlib.h> 	/* malloc(), free() */
-#include <stdbool.h>	/* bool */
 
 #define _hot __attribute__((hot))	/* called often */
-#define new(x) malloc(sizeof(x))
+#define new(x) calloc(1, sizeof(x))
 #define init_new(x, y, ...) x *y = malloc(sizeof(x)); *y = (x)__VA_ARGS__
 
 struct node { void *data; unsigned long long index; struct node *next; };
@@ -54,12 +53,12 @@ void list_destroy (list_t this) {
 	if (!this) return;
 	if (*this) {
 		struct node *next, *current = *this;
-		while (current) {
-			if (current->next) next = current->next;
+		do {
+			next = current->next;
 			free(current->data);
 			free(current);
 			current = next;
-		}
+		} while (next);
 	}
 	free(this);
 }
