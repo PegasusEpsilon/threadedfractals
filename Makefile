@@ -1,10 +1,10 @@
 CC=cc
-CFLAGS=-g -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=10
+CFLAGS=-g -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 LIBS=-lm
 DIVIDER=1
-THREADS=4
+THREADS=2
 LIMIT=1000
-MSAA=16
+MSAA=1
 SIZE_REAL=1920
 SIZE_IMAG=1080
 MSAA_REAL=$$(($(SIZE_REAL)*$(MSAA)))
@@ -55,7 +55,7 @@ threadless.msaa:	render threadless.map palette.bin
 threadless.rgb:	resample threadless.msaa
 	./$^ $(SIZE_REAL) $(MSAA) $@
 
-threadless.png:	pngify threaded.rgb
+threadless.png:	pngify threadless.rgb
 	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
 
 map:

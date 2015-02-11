@@ -82,14 +82,14 @@ void _cold usage (char *myself) {
 
 int main (int argc, char **argv) {
 
-	if (11 > argc) usage(argv[0]);
+	if (9 > argc) usage(argv[0]);
 
-	max.real = atoi(argv[3]);
-	max.imag = atoi(argv[4]);
-	viewport.center = strtold(argv[5], NULL) - strtold(argv[6], NULL) * I;
-	viewport.radius = strtold(argv[7], NULL) + strtold(argv[8], NULL) * I;
-	theta = strtold(argv[9], NULL);
-	output_file = fopen(argv[10], "w");
+	max.real = atoi(argv[1]);
+	max.imag = atoi(argv[2]);
+	viewport.center = strtold(argv[3], NULL) - strtold(argv[4], NULL) * I;
+	viewport.radius = strtold(argv[5], NULL) + strtold(argv[6], NULL) * I;
+	theta = strtold(argv[7], NULL);
+	output_file = fopen(argv[8], "w");
 
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
