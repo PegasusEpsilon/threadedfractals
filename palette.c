@@ -6,6 +6,7 @@
  *  v4.0 - Decoupled channels
  *  v4.1 - Added verbose flag, suppressed noisy debug info
  *  v4.2 - Rewrote some, added comments, verified that the RGB directive works
+ *  v4.3 - Cleanup
  */
 
 #include <stdio.h>      	/* perror(), puts(), printf(), fopen(), fgets(), feof(), sscanf(), fclose(), fwrite() */
@@ -34,22 +35,22 @@
 
 const char *channel[] = {"RED", "GRN", "BLU"};
 
-struct RGB24 {
+struct rgb24 {
 	uint8_t y[CHANNELS];
 };
 
-struct GRADIENT {
-	struct RGB24 *x;
+struct gradient {
+	struct rgb24 *x;
 	size_t length;
 };
 
-struct POINT {
+struct point {
 	double x;
 	double y;
 };
 
-struct CHANNEL {
-	struct POINT *points;
+struct channel {
+	struct point *points;
 	size_t length;
 };
 
@@ -81,7 +82,7 @@ void die (const char *fmt, ...) {
  * like linear interpolation (ugly, even modified), splines (complicated)
  * or curve fitting (in some cases, horrendously imprecise).
  */
-struct GRADIENT *generate_palette (const struct CHANNEL *channels, struct GRADIENT *gradient) {
+struct gradient *generate_palette (const struct channel *channels, struct gradient *gradient) {
 	uint8_t c;	/* only three channels, after all */
 	size_t i;	/* current point in overall interpolation */
 	size_t a;	/* starting point for this segment of interpolation */
@@ -135,11 +136,10 @@ void usage (const char *myself) {
 }
 
 /* allocate storage for, and store, specified point */
-struct CHANNEL *add_point (struct CHANNEL *in, double x, double y) {
-	struct POINT *new;
+struct channel *add_point (struct channel *in, double x, double y) {
+	struct point *new;
 	new = realloc(in->points, (in->length + 1) * sizeof(*(in->points)));
-	if (!new)
-		fail("failed to allocate memory");
+	if (!new) fail("failed to allocate memory");
 	in->points = new;
 	in->points[in->length].x = x;
 	in->points[in->length].y = y;
@@ -150,7 +150,7 @@ struct CHANNEL *add_point (struct CHANNEL *in, double x, double y) {
 /* allocate storage for, and store, channels as
  * specified, for each channel, all at once
  */
-void add_syncpoint (struct CHANNEL *channels, double x, char *line, off_t *off) {
+void add_syncpoint (struct channel *channels, double x, char *line, off_t *off) {
 	uint8_t c;
 	double y;
 	for (c = 0; c < CHANNELS; c++) {
@@ -162,21 +162,21 @@ void add_syncpoint (struct CHANNEL *channels, double x, char *line, off_t *off) 
 }
 
 /* print the parsed palette directives */
-void printparsed (struct CHANNEL *channels) {
+void printparsed (struct channel *channels) {
 	uint8_t c;
 	size_t i;
 	for (c = 0; c < CHANNELS; c++)
 		for (i = 0; i < channels[c].length; i++)
 			printf(
-					"%s: %f/%f\n",
-					channel[c],
-					channels[c].points[i].x,
-					channels[c].points[i].y
+				"%s: %f/%f\n",
+				channel[c],
+				channels[c].points[i].x,
+				channels[c].points[i].y
 			);
 }
 
 /* print the final interpolated palette data */
-void printoutput (struct GRADIENT *gradient) {
+void printoutput (struct gradient *gradient) {
 	size_t i;
 	for (i = 0; i < gradient->length; i++)
 		printf(
@@ -191,8 +191,8 @@ void printoutput (struct GRADIENT *gradient) {
 int main (int argc, char **argv) {
 	uint8_t c;
 	size_t i;
-	struct CHANNEL channels[CHANNELS];
-	struct GRADIENT gradient;
+	struct channel channels[CHANNELS];
+	struct gradient gradient;
 	FILE *infile;
 	FILE *outfile;
 
