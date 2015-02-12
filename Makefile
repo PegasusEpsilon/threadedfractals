@@ -1,5 +1,5 @@
 CC=cc
-CFLAGS=-g -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
+CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 LIBS=-lm
 DIVIDER=1
 THREADS=2

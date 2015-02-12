@@ -27,11 +27,11 @@ static inline _hot void display (void) {
 	putchar('[');
 	for (struct line *tmp = buffer_start; tmp < buffer_end; tmp++)
 		putchar(tmp->ready ? '#' : ' ');
-	putchar(']');
+	printf("]\n");
 	for (unsigned long long i = 0; i < thread_count; i++)
-		printf(" %llu,", queue[i]);
+		printf("%llu, ", queue[i]);
 	printf(
-		" %llu/%llu (%02.02f%%)\x1b[K\r",
+		"%llu/%llu (%02.02f%%)\x1b[K\x1b[A\r",
 		next_line, max.imag, next_line / (float)max.imag * 100
 	);
 	fflush(stdout);
@@ -124,8 +124,13 @@ int main (int argc, char **argv) {
 	thread_count = atoi(argv[1]);
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
-	viewport.center = strtold(argv[4], NULL) - strtold(argv[5], NULL) * I;
-	viewport.radius = strtold(argv[6], NULL) + strtold(argv[7], NULL) * I;
+	/* force GCC -ffast-math to be sensible */
+	long double tmp1 = strtold(argv[4], NULL);
+	long double tmp2 = strtold(argv[5], NULL);
+	viewport.center = tmp1 - tmp2 * I;
+	tmp1 = strtold(argv[6], NULL);
+	tmp2 = strtold(argv[7], NULL);
+	viewport.radius = tmp1 + tmp2 * I;
 	theta = strtold(argv[8], NULL);
 	output_file = fopen(argv[9], "w");
 
@@ -152,7 +157,7 @@ int main (int argc, char **argv) {
 	thread((void *)i);
 	while (--i < thread_count) pthread_join(threads[i], NULL);
 	display();
-	puts("\nDone!");
+	puts("\n\nDone!");
 
 	free(threads);
 	free(queue);
