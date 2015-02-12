@@ -1,7 +1,6 @@
 #!/bin/bash
 
 THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
-LIMIT=10
 MSAA=16
 SIZE_REAL=1920
 SIZE_IMAG=1080

@@ -6,7 +6,6 @@
 #include <pthread.h>	/* pthread_* */
 #include <stdbool.h>	/* bool, true, false */
 
-#include "indexedlist.h"
 #include "mapper.h"
 #include "sample.h"
 #include "types.h"
@@ -15,82 +14,95 @@
 #define _cold __attribute__((cold))	/* called rarely */
 #define unlikely(x) __builtin_expect(x, 0)
 
-unsigned long long lines_waiting = 0, max_lines_waiting;
+struct line { long double *data; bool ready; };
+
+struct line *buffer_start, *buffer_end, *buffer_read, *buffer_write;
+bool buffer_full = false;
+FILE *output_file;
+unsigned long long next_line = 0;
 unsigned long long thread_count, *queue;
 struct pixel max;
-unsigned long long render, write;
 
-void display (void) {
-	printf("%llu/%llu (%llu%%), queue: ", render, max.imag, 100 * render / max.imag);
+static inline _hot void display (void) {
+	putchar('[');
+	for (struct line *tmp = buffer_start; tmp < buffer_end; tmp++)
+		putchar(tmp->ready ? '#' : ' ');
+	putchar(']');
 	for (unsigned long long i = 0; i < thread_count; i++)
-		printf("%llu, ", queue[i]);
-	printf("buffer: %llu/%llu (%llu%%)\x1b[K\r",
-		lines_waiting, max_lines_waiting, 100 * lines_waiting / max_lines_waiting);
+		printf(" %llu,", queue[i]);
+	printf(
+		" %llu/%llu (%02.02f%%)\x1b[K\r",
+		next_line, max.imag, next_line / (float)max.imag * 100
+	);
 	fflush(stdout);
 }
 
 pthread_mutex_t write_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t data_written = PTHREAD_COND_INITIALIZER;
 FILE *output_file;
-list_t output_buffer;
-static inline _hot unsigned long long output (
-	long double *data, const unsigned long long sequence
-) {
+static inline _hot unsigned long long output (struct line **line) {
 	pthread_mutex_lock(&write_lock);
-	while (lines_waiting >= max_lines_waiting && write != sequence)
-		pthread_cond_wait(&data_written, &write_lock);
-	if (write == sequence) {
-		for (;;) {
-			fwrite(data, sizeof(long double), max.real, output_file);
-			free(data);
-			if (++write != list_first_index(output_buffer)) break;
-			data = list_pop(output_buffer);
-			--lines_waiting;
-		}
-		fflush(output_file);
-		pthread_cond_broadcast(&data_written);
-	} else {
-		++lines_waiting;
-		list_insert(output_buffer, data, sequence);
-		list_first_index(output_buffer);
+
+	while (buffer_read->ready) {
+		fwrite(buffer_read->data, sizeof(long double), max.real, output_file);
+		buffer_full = buffer_read->ready = false;
+		if (++buffer_read == buffer_end) buffer_read = buffer_start;
 	}
-	unsigned long long next = (render == max.imag ? (unsigned long long)-1 : render++);
+
+	if (!buffer_full) pthread_cond_broadcast(&data_written);
+	else while (buffer_full) pthread_cond_wait(&data_written, &write_lock);
+
+	if (next_line == max.imag) {
+		pthread_mutex_unlock(&write_lock);
+		return -1;
+	}
+
+	*line = buffer_write;
+
+	if (++buffer_write == buffer_end) buffer_write = buffer_start;
+
+	if (buffer_write == buffer_read) buffer_full = true;
+
+	display();
+
 	pthread_mutex_unlock(&write_lock);
-	return next;
+
+	return next_line++;
 }
 
 long double theta;
 long double complex pixelsize;
 struct region viewport;
-static inline _hot long double *iterate_line (
-	const unsigned long long line
+static inline _hot struct line **iterate_line (
+	struct line **line, unsigned long long imag
 ) {
 	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
-	long double *buffer = calloc(max.real, sizeof(long double));
-	struct pixel this = { .imag = line };
+	struct pixel this = { .imag = imag };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
 		coordinates.c = pixel2vector(&this, &pixelsize, &viewport, &theta);
-		buffer[this.real] = sample(&coordinates);
+		(*line)->data[this.real] = sample(&coordinates);
 	}
-	return buffer;
+	(*line)->ready = true;
+	return line;
 }
 
-static inline void *thread (void *ptr) {
+static void *thread (void *ptr) {
 	unsigned long long thread = (unsigned long long)ptr;
+	struct line *line = buffer_start + thread;
 	queue[thread] = thread;
 	while ((unsigned long long)-1 != (
-		queue[thread] = output(iterate_line(queue[thread]), queue[thread])
-	)) { display(); }
+		queue[thread] = output(iterate_line(&line, queue[thread]))
+	));
+	queue[thread] = 0;
 	return NULL;
 }
 
 __attribute__((noreturn))
 void _cold usage (char *myself) {
 	puts("Threaded Mandelbrot sampler\n");
-	printf("Usage: %s THREADS LIMIT WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
+	printf("Usage: %s THREADS WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
 	puts("	THREADS	how many threads to spawn");
-	puts("	LIMIT	max pending writes before threads block");
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
 	puts("	center coordinates (CEN_REAL, CEN_IMAG)");
@@ -107,20 +119,28 @@ void _cold usage (char *myself) {
 
 int main (int argc, char **argv) {
 
-	if (11 > argc) usage(argv[0]);
+	if (10 > argc) usage(argv[0]);
 
-	render = thread_count = atoi(argv[1]);
-	max_lines_waiting = atoi(argv[2]);
-	max.real = atoi(argv[3]);
-	max.imag = atoi(argv[4]);
-	viewport.center = strtold(argv[5], NULL) - strtold(argv[6], NULL) * I;
-	viewport.radius = strtold(argv[7], NULL) + strtold(argv[8], NULL) * I;
-	theta = strtold(argv[9], NULL);
-	output_file = fopen(argv[10], "w");
+	thread_count = atoi(argv[1]);
+	max.real = atoi(argv[2]);
+	max.imag = atoi(argv[3]);
+	viewport.center = strtold(argv[4], NULL) - strtold(argv[5], NULL) * I;
+	viewport.radius = strtold(argv[6], NULL) + strtold(argv[7], NULL) * I;
+	theta = strtold(argv[8], NULL);
+	output_file = fopen(argv[9], "w");
 
+	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
-	output_buffer = new_list();
+	/* allocate output buffer */
+	unsigned long long buffer_size = 8 * thread_count;
+	buffer_read = buffer_start = calloc(buffer_size, sizeof(struct line));
+	buffer_write = buffer_read + thread_count;
+	buffer_end = buffer_start + buffer_size;
+	for (unsigned long long i = 0; i < buffer_size; i++)
+		buffer_start[i].data = calloc(max.real, sizeof(long double));
+
+	/* allocate process tracking space */
 	queue = calloc(thread_count, sizeof(unsigned long long));
 	pthread_t *threads = calloc(thread_count - 1, sizeof(pthread_t));
 
@@ -131,10 +151,12 @@ int main (int argc, char **argv) {
 		pthread_create(threads + i, NULL, &thread, (void *)i);
 	thread((void *)i);
 	while (--i < thread_count) pthread_join(threads[i], NULL);
+	display();
+	puts("\nDone!");
 
 	free(threads);
 	free(queue);
-	list_destroy(output_buffer);
+	free(buffer_start);
 	fclose(output_file);
 
 	return 0;

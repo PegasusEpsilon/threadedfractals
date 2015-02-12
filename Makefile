@@ -3,7 +3,6 @@ CFLAGS=-g -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 LIBS=-lm
 DIVIDER=1
 THREADS=2
-LIMIT=10
 MSAA=1
 SIZE_REAL=1920
 SIZE_IMAG=1080
@@ -16,7 +15,7 @@ RADIUS_IMAG=$(shell echo "scale=40;$(RADIUS_REAL)*$(SIZE_IMAG)/$(SIZE_REAL)"|bc|
 THETA=0
 ARGS=$(MSAA_REAL) $(MSAA_IMAG) $(CENTER_REAL) $(CENTER_IMAG) $(RADIUS_REAL) $(RADIUS_IMAG) $(THETA)
 
-threaded:	threaded.c sample.h sample.o mapper.h mapper.o indexedlist.h indexedlist.o types.h
+threaded:	threaded.c sample.h sample.o mapper.h mapper.o types.h
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS) -lpthread
 
 threadless:	threadless.c sample.h sample.o mapper.h mapper.o types.h
@@ -35,7 +34,7 @@ pngify:	pngify.c
 	$(CC) $(CFLAGS) $^ -o $@ -lz
 
 threaded.map:	threaded
-	bash -c 'time ./$^ $(THREADS) $(LIMIT) $(ARGS) $@'
+	bash -c 'time ./$^ $(THREADS) $(ARGS) $@'
 
 threaded.msaa:	render threaded.map palette.bin
 	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
