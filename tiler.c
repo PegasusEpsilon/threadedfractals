@@ -22,10 +22,10 @@
 
 __attribute__((noreturn))
 static inline void usage (char *myself) {
-	printf("Usage: %s INFILE WIDTH HEIGHT VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
+	printf("Usage: %s INFILE HEIGHT WIDTH VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
 	puts("	INFILE	Input filename");
-	puts("	WIDTH	Width of input file");
 	puts("	HEIGHT	Height of input file");
+	puts("	WIDTH	Width of input file");
 	puts("	ROWS	Number of rows to tile");
 	puts("	LINES	Number of lines to tile");
 	puts("		Example, 10 rows and 10 lines will make 100 tiles,");
