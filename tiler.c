@@ -69,7 +69,7 @@ FILE *spawn_compressor (
 			char **file;
 			char **width;
 			char **height;
-		};
+		} byname;
 	} ptr = {{ 0 }};
 
 	if (!*extension) {
@@ -86,13 +86,13 @@ FILE *spawn_compressor (
 	}
 
 	int i;
-	if (ptr.fifo) i = asprintf(ptr.fifo, "%s" NUMBERS_FMT FIFO_EXT, outfile, y, x);
-	if (ptr.file) i = asprintf(ptr.file, "%s" NUMBERS_FMT ".%s", outfile, y, x, extension);
-	if (ptr.width) i = asprintf(ptr.width, "%" PRIuSIZET, width);
-	if (ptr.height) i = asprintf(ptr.height, "%" PRIuSIZET, height);
+	if (ptr.byname.fifo) i = asprintf(ptr.byname.fifo, "%s" NUMBERS_FMT FIFO_EXT, outfile, y, x);
+	if (ptr.byname.file) i = asprintf(ptr.byname.file, "%s" NUMBERS_FMT ".%s", outfile, y, x, extension);
+	if (ptr.byname.width) i = asprintf(ptr.byname.width, "%" PRIuSIZET, width);
+	if (ptr.byname.height) i = asprintf(ptr.byname.height, "%" PRIuSIZET, height);
 	(void)i;
 
-	if (mkfifo(*ptr.fifo, 0600)) perror(*ptr.fifo);
+	if (mkfifo(*ptr.byname.fifo, 0600)) perror(*ptr.byname.fifo);
 
 	if (!fork()) {
 		for (int i = 0; tokens[i]; i++) if (ptr.byindex[i])
@@ -100,7 +100,7 @@ FILE *spawn_compressor (
 		execvpe(*argv, argv, envp);
 	}
 
-	FILE *ret = fopen(*ptr.fifo, "w");
+	FILE *ret = fopen(*ptr.byname.fifo, "w");
 	for (int i = 0; tokens[i]; i++) free(*ptr.byindex[i]);
 	return ret;
 }
@@ -132,8 +132,11 @@ int main (int argc, char **argv, char **envp) {
 		for (size_t y = 0; y < height; y++)
 			for (size_t tx = 0; tx < horizontal_tiles; tx++) {
 				char *buffer = calloc(widths[tx], 3);
-				if (widths[tx] != fread(buffer, 3, widths[tx], input_file))
-					puts("short read");
+				if (widths[tx] != fread(buffer, 3, widths[tx], input_file)) {
+					y = height;
+					free(buffer);
+					break;
+				}
 				fwrite(buffer, 3, widths[tx], fifos[tx]);
 				free(buffer);
 			}
