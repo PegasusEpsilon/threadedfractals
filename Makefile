@@ -1,5 +1,5 @@
 CC=cc
-CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
+CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c11 -fmax-errors=3
 LIBS=-lm
 DIVIDER=1
 THREADS=2
@@ -15,17 +15,29 @@ RADIUS_IMAG=$(shell echo "scale=40;$(RADIUS_REAL)*$(SIZE_IMAG)/$(SIZE_REAL)"|bc|
 THETA=0
 ARGS=$(MSAA_REAL) $(MSAA_IMAG) $(CENTER_REAL) $(CENTER_IMAG) $(RADIUS_REAL) $(RADIUS_IMAG) $(THETA)
 
-threaded:	threaded.c sample.h sample.o mapper.h mapper.o types.h
-	$(CC) $(CFLAGS) $^ -o $@ $(LIBS) -lpthread
+threaded.png:	pngify threaded.rgb
+	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
 
-threadless:	threadless.c sample.h sample.o mapper.h mapper.o types.h
-	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+threaded.rgb:	resample threaded.msaa
+	./$^ $(SIZE_REAL) $(MSAA) $@
 
-render:	render.c
-	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+threaded.msaa:	render threaded.map palette.bin
+	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
 
-palette:	palette.c
-	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+threaded.map:	threaded
+	bash -c 'time ./$^ $(THREADS) $(ARGS) $@'
+
+threadless.png:	pngify threadless.rgb
+	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
+
+threadless.rgb:	resample threadless.msaa
+	./$^ $(SIZE_REAL) $(MSAA) $@
+
+threadless.msaa:	render threadless.map palette.bin
+	./render -l threadless.map palette.bin 0 $(DIVIDER) $@
+
+threadless.map:	threadless
+	bash -c 'time ./$^ $(ARGS) $@'
 
 palette.bin:	palette palette.txt
 	./palette palette.txt palette.bin
@@ -33,38 +45,30 @@ palette.bin:	palette palette.txt
 pngify:	pngify.c
 	$(CC) $(CFLAGS) $^ -o $@ -lz
 
-threaded.map:	threaded
-	bash -c 'time ./$^ $(THREADS) $(ARGS) $@'
+tiler:	tiler.c
+	$(CC) $(CFLAGS) $^ -o $@
 
-threaded.msaa:	render threaded.map palette.bin
-	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
+render:	render.c
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-threaded.rgb:	resample threaded.msaa
-	./$^ $(SIZE_REAL) $(MSAA) $@
+palette:	palette.c
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-threaded.png:	pngify threaded.rgb
-	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
+threaded:	threaded.c sample.h sample.o mapper.h mapper.o types.h
+	$(CC) $(CFLAGS) $^ -o $@ -lm -lpthread
 
-threadless.map:	threadless
-	bash -c 'time ./$^ $(ARGS) $@'
-
-threadless.msaa:	render threadless.map palette.bin
-	./render -l threadless.map palette.bin 0 $(DIVIDER) $@
-
-threadless.rgb:	resample threadless.msaa
-	./$^ $(SIZE_REAL) $(MSAA) $@
-
-threadless.png:	pngify threadless.rgb
-	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
+threadless:	threadless.c sample.h sample.o mapper.h mapper.o types.h
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 map:
 	rm sample.map || true
 
 clean: map
-	rm *.o render resample pngify \
-		threaded threadless palette \
+	rm *.o \
 		threaded.png threadless.png palette.png \
-		threaded.rgb threadless.rgb palette.bin \
-		threaded.msaa threadless.msaa \
-		threaded.map threadless.map || \
-	true
+		threaded.msaa threadless.msaa palette.bin \
+		threaded.rgb threadless.rgb \
+		threaded.map threadless.map \
+		threaded threadless \
+		palette render resample tiler pngify || \
+	trued
