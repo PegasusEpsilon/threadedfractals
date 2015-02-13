@@ -22,10 +22,10 @@
 
 __attribute__((noreturn))
 static inline void usage (char *myself) {
-	printf("Usage: %s INFILE HEIGHT WIDTH VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
+	printf("Usage: %s INFILE WIDTH HEIGHT VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
 	puts("	INFILE	Input filename");
-	puts("	HEIGHT	Height of input file");
 	puts("	WIDTH	Width of input file");
+	puts("	HEIGHT	Height of input file");
 	puts("	ROWS	Number of rows to tile");
 	puts("	LINES	Number of lines to tile");
 	puts("		Example, 10 rows and 10 lines will make 100 tiles,");
@@ -109,8 +109,8 @@ int main (int argc, char **argv, char **envp) {
 	if (8 > argc) usage(argv[0]);
 
 	char *input_filename = argv[1];
-	size_t total_height = atoi(argv[2]);
-	size_t total_width = atoi(argv[3]);
+	size_t total_width = atoi(argv[2]);
+	size_t total_height = atoi(argv[3]);
 	size_t vertical_tiles = atoi(argv[4]);
 	size_t horizontal_tiles = atoi(argv[5]);
 	char *output_filename = argv[6];
