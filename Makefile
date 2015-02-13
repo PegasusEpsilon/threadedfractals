@@ -71,4 +71,4 @@ clean: map
 		threaded.map threadless.map \
 		threaded threadless \
 		palette render resample tiler pngify || \
-	trued
+	true
