@@ -34,8 +34,8 @@ static inline void usage (char *myself) {
 	puts("		changing output.png to output-0-0.png, output-0-1.png, etc");
 	puts("	OUTPROG	Full path to output compressor");
 	puts("	ARGS	Any arguments that must be passed to the compressor");
-	puts("		Note: Use {infile} in place of the input filename");
-	puts("		Note: Use {outfile} in place of the output filename");
+	puts("		Note: Various tokens may be used here to be replaced when calling the");
+	puts("		compressor. Available tokens are {infile} {outfile} {height} and {width}");
 	puts("\nReport bugs to Pegasus Epsilon <pegasus@pimpninjas.org>");
 	exit(1);
 }
