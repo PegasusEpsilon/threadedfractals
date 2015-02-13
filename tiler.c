@@ -22,9 +22,10 @@
 
 __attribute__((noreturn))
 static inline void usage (char *myself) {
-	printf("Usage: %s INFILE WIDTH VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
+	printf("Usage: %s INFILE WIDTH HEIGHT VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
 	puts("	INFILE	Input filename");
 	puts("	WIDTH	Width of input file");
+	puts("	HEIGHT	Height of input file");
 	puts("	ROWS	Number of rows to tile");
 	puts("	LINES	Number of lines to tile");
 	puts("		Example, 10 rows and 10 lines will make 100 tiles,");
@@ -38,12 +39,6 @@ static inline void usage (char *myself) {
 	puts("		compressor. Available tokens are {infile} {outfile} {height} and {width}");
 	puts("\nReport bugs to Pegasus Epsilon <pegasus@pimpninjas.org>");
 	exit(1);
-}
-
-static inline int get_height (char *infile, int width) {
-	struct stat buf;
-	stat(infile, &buf);
-	return buf.st_size / width / 3;
 }
 
 static inline char *split_filename_ext (char *in) {
@@ -111,16 +106,14 @@ FILE *spawn_compressor (
 }
 
 int main (int argc, char **argv, char **envp) {
-	if (7 > argc) usage(argv[0]);
+	if (8 > argc) usage(argv[0]);
 
 	char *input_filename = argv[1];
-	size_t total_width = atoi(argv[2]);
-	size_t vertical_tiles = atoi(argv[3]);
-	size_t horizontal_tiles = atoi(argv[4]);
-	char *output_filename = argv[5];
-
-	size_t total_height = get_height(input_filename, total_width);
-
+	size_t total_height = atoi(argv[2]);
+	size_t total_width = atoi(argv[3]);
+	size_t vertical_tiles = atoi(argv[4]);
+	size_t horizontal_tiles = atoi(argv[5]);
+	char *output_filename = argv[6];
 	FILE *input_file = fopen(input_filename, "r");
 	FILE **fifos = malloc(horizontal_tiles * sizeof(FILE *));
 
@@ -133,7 +126,7 @@ int main (int argc, char **argv, char **envp) {
 		for (size_t tx = 0; tx < horizontal_tiles; tx++) {
 			widths[tx] = (size_t)((1 + tx) * total_width / horizontal_tiles)
 			           - (size_t)(     tx  * total_width / horizontal_tiles);
-			fifos[tx] = spawn_compressor(&argv[6], envp, output_filename, widths[tx], height, ty, tx);
+			fifos[tx] = spawn_compressor(&argv[7], envp, output_filename, widths[tx], height, ty, tx);
 		}
 
 		for (size_t y = 0; y < height; y++)
