@@ -134,6 +134,7 @@ int main (int argc, char **argv, char **envp) {
 				char *buffer = calloc(widths[tx], 3);
 				if (widths[tx] != fread(buffer, 3, widths[tx], input_file)) {
 					y = height;
+					ty = vertical_tiles;
 					free(buffer);
 					break;
 				}
