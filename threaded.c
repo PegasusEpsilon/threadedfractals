@@ -95,6 +95,7 @@ static void *thread (void *ptr) {
 		queue[thread] = output(iterate_line(&line, queue[thread]))
 	));
 	queue[thread] = 0;
+	pthread_exit(0);
 	return NULL;
 }
 
@@ -151,11 +152,10 @@ int main (int argc, char **argv) {
 
 	printf("spinning up %llu threads\n", thread_count);
 
-	unsigned long long i = 0;
-	for (; i < thread_count - 1; i++)
-		pthread_create(threads + i, NULL, &thread, (void *)i);
-	thread((void *)i);
-	while (--i < thread_count) pthread_join(threads[i], NULL);
+	for (next_line = 0; next_line < thread_count - 1; next_line++)
+		pthread_create(threads + next_line, NULL, &thread, (void *)next_line);
+	thread((void *)next_line++);
+	while (--thread_count) pthread_join(threads[thread_count], NULL);
 	display();
 	puts("\n\nDone!");
 
