@@ -129,11 +129,13 @@ int main (int argc, char **argv, char **envp) {
 			fifos[tx] = spawn_compressor(&argv[7], envp, output_filename, widths[tx], height, ty, tx);
 		}
 
+		size_t row = ty;
 		for (size_t y = 0; y < height; y++)
 			for (size_t tx = 0; tx < horizontal_tiles; tx++) {
 				char *buffer = calloc(widths[tx], 3);
 				if (widths[tx] != fread(buffer, 3, widths[tx], input_file)) {
 					y = height;
+					ty = vertical_tiles;
 					free(buffer);
 					break;
 				}
@@ -144,7 +146,7 @@ int main (int argc, char **argv, char **envp) {
 		for (size_t tx = 0; tx < horizontal_tiles; tx++) {
 			fclose(fifos[tx]);
 			char *fifo;
-			int i = asprintf(&fifo, "%s" NUMBERS_FMT FIFO_EXT, output_filename, ty, tx);
+			int i = asprintf(&fifo, "%s" NUMBERS_FMT FIFO_EXT, output_filename, row, tx);
 			(void)i; unlink(fifo); free(fifo);
 		}
 
