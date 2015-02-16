@@ -5,13 +5,11 @@
 #include "types.h"
 
 #define ESCAPE 16
-#define _pure __attribute__((pure))	/* external state doesn't matter */
-#define _hot __attribute__((hot))	/* called often */
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
 #define unlikely(x) __builtin_expect(x, false)	/* branch prediction */
 
-
-static inline bool _pure _hot inset (long double complex c) {
+__attribute__((pure hot always_inline))
+static inline bool inset (long double complex c) {
 	long double r = creall(c), i = cimagl(c);
 	long double rm = r - 0.25, rp2 = r + 1, i2 = i * i;
 	long double t = rm * rm + i2; rp2 *= rp2;
@@ -24,7 +22,8 @@ static inline bool _pure _hot inset (long double complex c) {
 	return false;
 }
 
-long double _pure _hot sample (struct coordinates_4d *coordinates) {
+__attribute__((pure hot))
+long double sample (struct coordinates_4d *coordinates) {
 	long double complex z = coordinates->z, c = coordinates->c,
 	                   oz = 255 + 255 * I;
 	unsigned i, deadline = 1;
