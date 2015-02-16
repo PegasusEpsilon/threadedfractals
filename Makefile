@@ -42,7 +42,7 @@ threadless.map:	threadless
 palette.bin:	palette palette.txt
 	./palette palette.txt palette.bin
 
-pngify:	pngify.c
+pngify:	pngify.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lz
 
 tiler:	tiler.c
@@ -51,7 +51,7 @@ tiler:	tiler.c
 render:	render.c
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-palette:	palette.c
+palette:	palette.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 threaded:	threaded.c sample.h sample.o mapper.h mapper.o types.h

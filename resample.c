@@ -11,6 +11,8 @@
 #include <stdlib.h>  	/* exit() */
 #include <string.h>  	/* strcmp() */
 
+#include "utils.h"
+
 #define CHANNELS 3
 #define RED 0
 #define GRN 1
@@ -25,16 +27,6 @@ void usage (char *myself) {
 	printf("Usage: %s [-v] infile width factor outfile\n", myself);
 	exit(0);
 }
-
-__attribute__((noreturn))
-void fail (const char *msg) {	/* report function failures */
-	perror(msg);
-	exit(1);
-}
-
-/* runtime function swapping ftw */
-int nothing (const char *f, ...) { return (long)f; }
-int (*debug)(const char *f, ...) = &nothing;
 
 RGB24 downsample (size_t px_width, RGB24 **samples) {
 	struct {
@@ -68,9 +60,9 @@ int main (int argc, char **argv) {
 	FILE *ifile, *ofile;
 	RGB24 *ibuf, *obuf, **samples;
 
-	/* enable debug output */
-	if (argc > 5 && !strcmp(argv[1], "-v"))
-		{ debug = &printf; argc--; argv++; }
+	/* enable debug output, maybe */
+	if (argc > 5 && *(uint16_t *)"-v" == *(uint16_t *)argv[1])
+		{ enable_debug(); argv[1] = argv[0]; argc--; argv++; }
 
 	/* make sure we have the right amount of arguments */
 	if (5 != argc) usage(argv[0]);

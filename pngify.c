@@ -11,6 +11,8 @@
 #include <zlib.h>     	/* z_stream, deflateInit2(), deflate(), crc32() */
 #include <arpa/inet.h>	/* htonl() - noop on network-order machines */
 
+#include "utils.h"
+
 /* unalienate crc32 -- native types please! */
 #define crc32(x, y, z) (uint32_t)crc32((uLong)x, (Bytef *)y, (uInt)z)
 #define Z_CHUNK (size_t)(32 << 10) /* 32kB */
@@ -41,24 +43,6 @@ struct png_iend {
 __attribute__((pure cold noreturn))
 void usage (const char *restrict const myself) {
 	printf("Usage: %s infile width height outfile\n", myself);
-	exit(1);
-}
-
-/* Print errno error message and exit with errorlevel */
-__attribute__((cold noreturn)) /* can it be pure when it calls perror? */
-void fail (const char *restrict const msg) {
-	perror(msg);
-	exit(1);
-}
-
-/* Print custom message and exit with errorlevel */
-__attribute__((pure cold noreturn))
-void die (const char *restrict const fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	vprintf(fmt, args);
-	va_end(args);
-	puts(".");
 	exit(1);
 }
 
@@ -100,18 +84,7 @@ static inline int output (
 	return !stream->avail_out;
 }
 
-int debug_off (const char *restrict const fmt, ...) { return (long)fmt; }
-int debug_on  (const char *restrict const fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	int ret = vprintf(fmt, args);
-	va_end(args);
-	fflush(stdout);
-	return ret;
-}
-
 int main (int argc, char **argv) {
-	int (*debug)(const char *, ...) = &debug_off;
 	FILE *ifile, *ofile;
 	long idat_start, idat_end, idat_size;
 	uint32_t crc, height, width;
@@ -141,9 +114,11 @@ int main (int argc, char **argv) {
 	} };
 
 	/* Turn on verbose, maybe */
-	if (1 < argc) {
-		if (*(uint16_t *)argv[1] == *(uint16_t *)"-v") debug = &debug_on;
-		if (debug != &debug_off) { argv[1] = argv[0]; argc--; argv++; }
+	if (1 < argc && *(uint16_t *)"-v" == *(uint16_t *)argv[1]) {
+		enable_debug();
+		argv[1] = argv[0];
+		argc--;
+		argv++;
 	}
 
 	/* Make sure we've got our args */

@@ -20,9 +20,10 @@
 #	define PRIuSIZET "zu"
 #endif
 #include <sys/types.h>  	/* off_t */
-#include <string.h>     	/* strcmp() */
 #include <math.h>       	/* cos(), fmod() */
+
 #include "constants.h"
+#include "utils.h"
 
 #define CHANNELS 3
 #define RED 0
@@ -33,7 +34,7 @@
  */
 #define LINELEN 128
 
-const char *channel[] = {"RED", "GRN", "BLU"};
+const char *channel[] = { "RED", "GRN", "BLU" };
 
 struct rgb24 {
 	uint8_t y[CHANNELS];
@@ -53,28 +54,6 @@ struct channel {
 	struct point *points;
 	size_t length;
 };
-
-/* runtime debug-or-not */
-int nothing (const char *f, ...) { return (long)f; }
-int (*debug)(const char *f, ...) = &nothing;
-
-/* report function failures */
-__attribute__((noreturn))
-void fail (const char *msg) {
-	perror(msg);
-	exit(1);
-}
-
-/* report errors */
-__attribute__((noreturn))
-void die (const char *fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	vprintf(fmt, args);
-	va_end(args);
-	puts(".");
-	exit(1);
-}
 
 /* This function generates a cosine interpolated multi-channel cyclical
  * waveform for use as a palette. Chosen for simplicity (no, really),
@@ -197,8 +176,8 @@ int main (int argc, char **argv) {
 	FILE *outfile;
 
 	/* handle the verbose flag */
-	if (argc > 1 && !strcmp("-v", argv[1])) {
-		debug = &printf;
+	if (1 < argc && *(uint16_t *)"-v" == *(uint16_t *)argv[1]) {
+		enable_debug();
 		argc--;
 		argv[1] = argv[0];
 		argv++;
