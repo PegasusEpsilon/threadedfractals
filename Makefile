@@ -19,7 +19,11 @@ threaded.png:	pngify threaded.rgb
 	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
 
 threaded.rgb:	resample threaded.msaa
+ifneq ($(MSAA), 1)
 	./$^ $(SIZE_REAL) $(MSAA) $@
+else
+	ln -sf threaded.msaa threaded.rgb
+endif
 
 threaded.msaa:	render threaded.map palette.bin
 	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
@@ -31,7 +35,11 @@ threadless.png:	pngify threadless.rgb
 	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
 
 threadless.rgb:	resample threadless.msaa
+ifneq ($(MSAA), 1)
 	./$^ $(SIZE_REAL) $(MSAA) $@
+else
+	ln -sf threadless.msaa threadless.rgb
+endif
 
 threadless.msaa:	render threadless.map palette.bin
 	./render -l threadless.map palette.bin 0 $(DIVIDER) $@
@@ -45,7 +53,7 @@ palette.bin:	palette palette.txt
 pngify:	pngify.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lz
 
-tiler:	tiler.c
+resample:	resample.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 render:	render.c
