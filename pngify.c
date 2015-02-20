@@ -10,6 +10,7 @@
 #include <stdint.h>   	/* uint(8|16|32)_t */
 #include <zlib.h>     	/* z_stream, deflateInit2(), deflate(), crc32() */
 #include <arpa/inet.h>	/* htonl() - noop on network-order machines */
+#include <string.h>
 
 #include "utils.h"
 
@@ -86,7 +87,7 @@ static inline int output (
 
 int main (int argc, char **argv) {
 	FILE *ifile, *ofile;
-	long idat_start, idat_end, idat_size;
+	long idat_start, idat_size;
 	uint32_t crc, height, width;
 
 	z_stream stream = {
@@ -172,6 +173,7 @@ int main (int argc, char **argv) {
 	/* Remember to CRC every single byte */
 	crc = crc32(crc, zlib_header, 2);
 	fwrite(zlib_header, 2, 1, ofile);
+	//fwrite("compressed data\n", strlen("compressed data\n"), 1, ofile);
 
 	/* Compress the stream */
 	uint8_t input[Z_CHUNK] = { 0 };
@@ -192,16 +194,12 @@ int main (int argc, char **argv) {
 	output(&stream, Z_FINISH, ofile, &crc);
 	fclose(ifile);
 	deflateEnd(&stream);
+	//fwrite("\ncompressed data", strlen("\ncompressed data"), 1, ofile);
 
-	/* Go back and write the IDAT size,
-	 * which we left blank before,
-	 * now that we know what it is.
-	 */
-	idat_end = ftell(ofile);
-	idat_start = htonl(idat_end - idat_start);
-	fseek(ofile, idat_size, SEEK_SET);
-	fwrite(&idat_start, sizeof(uint32_t), 1, ofile);
-	fseek(ofile, idat_end, SEEK_SET);
+	/* calculate IDAT size */
+	idat_start = ftell(ofile) - idat_start;
+	debug("IDAT size: %lu\n", idat_start);
+	idat_start = htonl(idat_start);
 
 	/* Write the CRC, in network byte order */
 	crc = htonl(crc);
@@ -209,6 +207,10 @@ int main (int argc, char **argv) {
 
 	/* Write the IEND chunk */
 	fwrite_chunk((struct png_chunk *)&iend, ofile);
+
+	/* go back and fill in the IDAT size */
+	fseek(ofile, idat_size, SEEK_SET);
+	fwrite(&idat_start, sizeof(uint32_t), 1, ofile);
 
 	/* Finish up */
 	fclose(ofile);
