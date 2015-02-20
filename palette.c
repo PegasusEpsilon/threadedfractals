@@ -19,7 +19,7 @@
 #	include <inttypes.h>	/* uint8_t */
 #	define PRIuSIZET "zu"
 #endif
-#include <sys/types.h>  	/* off_t */
+#include <stddef.h>     	/* ptrdiff_t */
 #include <math.h>       	/* cos(), fmod() */
 
 #include "constants.h"
@@ -129,12 +129,12 @@ struct channel *add_point (struct channel *in, double x, double y) {
 /* allocate storage for, and store, channels as
  * specified, for each channel, all at once
  */
-void add_syncpoint (struct channel *channels, double x, char *line, off_t *off) {
+void add_syncpoint (struct channel *channels, double x, char *line, ptrdiff_t *diff) {
 	uint8_t c;
 	double y;
 	for (c = 0; c < CHANNELS; c++) {
-		line += *off;
-		sscanf(line, "%lf%zn", &y, off);
+		line += *diff;
+		sscanf(line, "%lf%tn", &y, diff);
 		debug(",%f", y);
 		add_point(&(channels[c]), x, y);
 	}
@@ -203,10 +203,10 @@ int main (int argc, char **argv) {
 		 * LINELEN bytes is more than we should ever need
 		 */
 		char line[LINELEN];
-		/* off = character offset in current line
+		/* syncdiff = character offset in current line
 		 * used only in RGB directive
 		 */
-		off_t off = 0;
+		ptrdiff_t syncdiff = 0;
 
 		/* read a line */
 		if (NULL == fgets(line, LINELEN, infile)) {
@@ -244,10 +244,10 @@ int main (int argc, char **argv) {
 		} else if (sscanf(line+i, "BLU%lf%lf", &x, &y)) {
 			debug("read BLU control point %lf/%lf\n", x, y);
 			add_point(&channels[BLU], x, y);
-		} else if (sscanf(line+i, "RGB%lf%jn", &x, &off)) {
+		} else if (sscanf(line+i, "RGB%lf%jn", &x, &syncdiff)) {
 			/* Tested and fixed. Not sure it's the best way, though. */
 			debug("read RGB control point %lf", x);
-			add_syncpoint(channels, x, line+i, &off);
+			add_syncpoint(channels, x, line+i, &syncdiff);
 			if (&printf == debug) putchar('\n');
 		} else
 			printf("Warning: Unknown statement in config file: %s\n", line+i);
