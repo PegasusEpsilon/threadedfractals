@@ -10,8 +10,11 @@
  * make git get that right?
  */
 
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 #ifndef M_PI
 #	define M_PI 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421
-#endif
+#endif /* M_PI */
 #define FALSE 0
 #define TRUE !FALSE
+#endif /* CONSTANTS_H */
