@@ -65,9 +65,12 @@ static inline _hot unsigned long long output (struct line **line) {
 
 	display();
 
+	/* remember to increment inside the loop, which requires returning a copy */
+	unsigned long long copy = next_line++;
+
 	pthread_mutex_unlock(&write_lock);
 
-	return next_line++;
+	return copy;
 }
 
 long double theta;
