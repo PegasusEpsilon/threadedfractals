@@ -134,7 +134,7 @@ void add_syncpoint (struct channel *channels, double x, char *line, off_t *off) 
 	double y;
 	for (c = 0; c < CHANNELS; c++) {
 		line += *off;
-		sscanf(line, "%lf%jn", &y, off);
+		sscanf(line, "%lf%zn", &y, off);
 		debug(",%f", y);
 		add_point(&(channels[c]), x, y);
 	}
