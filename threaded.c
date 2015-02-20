@@ -86,8 +86,6 @@ static inline _hot struct line **iterate_line (
 		coordinates.c = pixel2vector(&this, &pixelsize, &viewport, &theta);
 		(*line)->data[this.real] = sample(&coordinates);
 	}
-	// Turns out my CPU does witchcraft. This will put a stop to that.
-	__sync_synchronize();
 	(*line)->ready = true;
 	return line;
 }
