@@ -7,7 +7,7 @@ MSAA_REAL=$(($SIZE_REAL*$MSAA))
 MSAA_IMAG=$(($SIZE_IMAG*$MSAA))
 
 cleanup () { rm threadless.map threadless.msaa threadless.rgb; exit; }
-cleanup
+rm threadless.map threadless.msaa threadless.rgb
 mkfifo threadless.map threadless.msaa threadless.rgb
 trap cleanup 1 2 3 4 5 6 7 8 11 13 14 15
 
