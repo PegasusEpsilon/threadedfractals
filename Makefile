@@ -80,5 +80,6 @@ clean: map
 		threaded.rgb threadless.rgb \
 		threaded.map threadless.map \
 		threaded threadless \
+		renormalized.so \
 		palette render resample tiler pngify || \
 	true

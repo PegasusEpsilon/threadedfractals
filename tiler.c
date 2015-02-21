@@ -20,8 +20,8 @@
 #define FIFO_EXT ".rgb"
 #define OUTPUT_EXT ".png"
 
-__attribute__((noreturn))
-static inline void usage (char *myself) {
+__attribute__((noreturn always_inline)) static inline
+void usage (char *myself) {
 	printf("Usage: %s INFILE WIDTH HEIGHT VTILES HTILES OUTFILE OUTPROG ARGS\n\n", myself);
 	puts("	INFILE	Input filename");
 	puts("	WIDTH	Width of input file");
@@ -41,7 +41,8 @@ static inline void usage (char *myself) {
 	exit(1);
 }
 
-static inline char *split_filename_ext (char *in) {
+__attribute__((cold always_inline)) static inline
+char *split_filename_ext (char *in) {
 	unsigned i = strlen(in);
 	while (i--) if ('.' == in[i]) {
 		in[i] = 0;

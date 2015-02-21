@@ -47,18 +47,15 @@ void usage (const char *restrict const myself) {
 	exit(1);
 }
 
-__attribute__((hot pure always_inline))
-static inline void crc_write (
-	const void *data, size_t size, FILE *stream, uint32_t *crc
-) {
+__attribute__((pure hot always_inline)) static inline
+void crc_write (const void *data, size_t size, FILE *stream, uint32_t *crc) {
 	*crc = crc32(*crc, data, size);
 	if (1 != fwrite(data, size, 1, stream) || ferror(stream)) fail("crc_write");
 }
 
-__attribute__((hot pure always_inline))
-static inline void fwrite_chunk (
-	struct png_chunk *restrict const chunk,
-	FILE *restrict const file
+__attribute__((pure hot always_inline)) static inline
+void fwrite_chunk (
+	struct png_chunk *restrict const chunk, FILE *restrict const file
 ) {
 	/* save this for later */
 	size_t size = chunk->size;
@@ -72,12 +69,10 @@ static inline void fwrite_chunk (
 	fwrite(&crc, sizeof(uint32_t), 1, file);
 }
 
-__attribute__((hot always_inline))
-static inline int output (
-	z_stream *restrict const stream,
-	const int flush,
-	FILE *restrict const file,
-	uint32_t *restrict const crc
+__attribute__((hot always_inline)) static inline
+int output (
+	z_stream *restrict const stream, const int flush,
+	FILE *restrict const file, uint32_t *restrict const crc
 ) {
 	static uint8_t buffer[Z_CHUNK];
 	size_t ready;

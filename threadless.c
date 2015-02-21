@@ -10,8 +10,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define _hot  __attribute__((hot ))	/* called often */
-#define _cold __attribute__((cold))	/* called rarely */
 #define unlikely(x) __builtin_expect(x, 0)
 
 long double *buffer;
@@ -19,7 +17,8 @@ FILE *output_file;
 unsigned long long next_line = 0;
 struct pixel max;
 
-static inline _hot void display (void) {
+__attribute__((hot always_inline)) static inline
+void display (void) {
 	printf(
 		"%llu/%llu (%02.02f%%)\x1b[K\r",
 		next_line, max.imag, next_line / (float)max.imag * 100
@@ -28,7 +27,8 @@ static inline _hot void display (void) {
 }
 
 FILE *output_file;
-static inline _hot void output (void) {
+__attribute__((hot always_inline)) static inline
+void output (void) {
 	fwrite(buffer, sizeof(long double), max.real, output_file);
 	display();
 	next_line++;
@@ -37,7 +37,8 @@ static inline _hot void output (void) {
 long double theta;
 long double complex pixelsize;
 struct region viewport;
-static inline _hot void iterate_line () {
+__attribute__((hot always_inline)) static inline
+void iterate_line () {
 	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
 	struct pixel this = { .imag = next_line };
 
@@ -47,15 +48,16 @@ static inline _hot void iterate_line () {
 	}
 }
 
-static void thread (void) {
+__attribute__((cold always_inline)) static inline
+void thread (void) {
 	do {
 		iterate_line();
 		output();
 	} while (next_line != max.imag);
 }
 
-__attribute__((noreturn))
-void _cold usage (char *myself) {
+__attribute__((cold noreturn always_inline)) static inline
+void usage (char *myself) {
 	puts("Unthreaded Mandelbrot sampler\n");
 	printf("Usage: %s SAMPLER WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
 	puts("	SAMPLER	shared object containing sampler function");

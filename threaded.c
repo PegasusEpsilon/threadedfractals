@@ -11,8 +11,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define _hot  __attribute__((hot ))	/* called often */
-#define _cold __attribute__((cold))	/* called rarely */
 #define unlikely(x) __builtin_expect(x, 0)
 
 struct line { long double *data; bool ready; };
@@ -24,7 +22,8 @@ unsigned long long next_line = 0;
 unsigned long long thread_count, *queue;
 struct pixel max;
 
-static inline _hot void display (void) {
+__attribute__((hot always_inline)) static inline
+void display (void) {
 	putchar('[');
 	for (struct line *tmp = buffer_start; tmp < buffer_end; tmp++)
 		putchar(tmp->ready ? '#' : ' ');
@@ -41,7 +40,8 @@ static inline _hot void display (void) {
 pthread_mutex_t write_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t data_written = PTHREAD_COND_INITIALIZER;
 FILE *output_file;
-static inline _hot unsigned long long output (struct line **line) {
+__attribute__((hot always_inline)) static inline
+unsigned long long output (struct line **line) {
 	pthread_mutex_lock(&write_lock);
 
 	while (buffer_read->ready) {
@@ -77,7 +77,8 @@ static inline _hot unsigned long long output (struct line **line) {
 long double theta;
 long double complex pixelsize;
 struct region viewport;
-static inline _hot struct line **iterate_line (
+__attribute__((hot always_inline)) static inline
+struct line **iterate_line (
 	struct line **line, unsigned long long imag
 ) {
 	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
@@ -103,8 +104,8 @@ static void *thread (void *ptr) {
 	return NULL;
 }
 
-__attribute__((noreturn))
-void _cold usage (char *myself) {
+__attribute__((cold noreturn always_inline)) static inline
+void usage (char *myself) {
 	puts("Threaded Mandelbrot sampler\n");
 	printf("Usage: %s SAMPLER THREADS WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
 	puts("	SAMPLER	shared object file containing sampler function");
