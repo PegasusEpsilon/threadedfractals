@@ -26,10 +26,8 @@ struct pixel max;
 __attribute__((hot always_inline)) static inline
 void display (void) {
 	putchar('[');
-	char c = buffer_start->ready ? '(' : ')';
 	for (struct line *tmp = buffer_start; tmp < buffer_end; tmp++)
-		if (tmp->assigned) putchar(c = c == ')' ? '(' : ')');
-		else putchar(tmp->ready ? '#' : ' ');
+		putchar(tmp->ready ? '#' : tmp->assigned ? '|' : ' ');
 	printf("]\n");
 	for (unsigned long long i = 0; i < thread_count; i++)
 		printf("%llu, ", queue[i]);
