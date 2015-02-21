@@ -107,8 +107,7 @@ static void *thread (void *ptr) {
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
 	puts("Threaded Mandelbrot sampler\n");
-	printf("Usage: %s SAMPLER THREADS WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
-	puts("	SAMPLER	shared object file containing sampler function");
+	printf("Usage: %s THREADS WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	THREADS	how many threads to spawn");
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
@@ -120,6 +119,8 @@ void usage (char *myself) {
 	puts("		imaginary	height \"");
 	puts("	THETA	angle to rotate the sample matrix around the center coordinate");
 	puts("	OUTFILE	name of file to write output to");
+	puts("	SAMPLER	shared object file containing sampler function");
+	puts("	ARGS	any extra arguments required by the sampler");
 	puts("\nReport bugs to pegasus@pimpninjas.org");
 	exit(0);
 }
@@ -128,19 +129,19 @@ int main (int argc, char **argv) {
 
 	if (11 > argc) usage(argv[0]);
 
-	sample = get_sampler(argv[1]);
-	thread_count = atoi(argv[2]);
-	max.real = atoi(argv[3]);
-	max.imag = atoi(argv[4]);
+	thread_count = atoi(argv[1]);
+	max.real = atoi(argv[2]);
+	max.imag = atoi(argv[3]);
 	/* force GCC -ffast-math to be sensible */
-	long double tmp1 = strtold(argv[5], NULL);
-	long double tmp2 = strtold(argv[6], NULL);
+	long double tmp1 = strtold(argv[4], NULL);
+	long double tmp2 = strtold(argv[5], NULL);
 	viewport.center = tmp1 - tmp2 * I;
-	tmp1 = strtold(argv[7], NULL);
-	tmp2 = strtold(argv[8], NULL);
+	tmp1 = strtold(argv[6], NULL);
+	tmp2 = strtold(argv[7], NULL);
 	viewport.radius = tmp1 + tmp2 * I;
-	theta = strtold(argv[9], NULL);
-	output_file = fopen(argv[10], "w");
+	theta = strtold(argv[8], NULL);
+	output_file = fopen(argv[9], "w");
+	sample = get_sampler(argv[10], &argv[11]);
 
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &viewport);

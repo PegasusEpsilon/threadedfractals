@@ -5,5 +5,7 @@
 
 void *sampler_handle;
 
-__attribute__((cold)) long double (*get_sampler (char *lib_name))(struct coordinates_4d *);
+__attribute__((cold))
+long double (*get_sampler (char *lib_name, char **))(struct coordinates_4d *);
+
 #endif /* LOADER_H */

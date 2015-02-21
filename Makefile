@@ -12,6 +12,7 @@ CENTER_IMAG=-0.13661091
 RADIUS_REAL=0.00016
 RADIUS_IMAG=$(shell echo "scale=40;$(RADIUS_REAL)*$(SIZE_IMAG)/$(SIZE_REAL)"|bc|sed -e 's/0*$$//')
 THETA=0
+SAMPLER=renormalized.so
 ARGS=$(MSAA_REAL) $(MSAA_IMAG) $(CENTER_REAL) $(CENTER_IMAG) $(RADIUS_REAL) $(RADIUS_IMAG) $(THETA)
 
 threaded.png:	pngify threaded.rgb
@@ -27,8 +28,8 @@ endif
 threaded.msaa:	render threaded.map palette.bin
 	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
 
-threaded.map:	threaded renormalized.so
-	bash -c 'time ./$^ $(THREADS) $(ARGS) $@'
+threaded.map:	threaded $(SAMPLER)
+	bash -c 'time ./$< $(THREADS) $(ARGS) $@ $(SAMPLER)'
 
 threadless.png:	pngify threadless.rgb
 	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
@@ -43,8 +44,8 @@ endif
 threadless.msaa:	render threadless.map palette.bin
 	./render -l threadless.map palette.bin 0 $(DIVIDER) $@
 
-threadless.map:	threadless renormalized.so
-	bash -c 'time ./$^ $(ARGS) $@'
+threadless.map:	threadless $(SAMPLER)
+	bash -c 'time ./$< $(ARGS) $@ $(SAMPLER)'
 
 palette.bin:	palette palette.txt
 	./palette palette.txt palette.bin
