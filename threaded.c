@@ -25,7 +25,7 @@ __attribute__((hot always_inline)) static inline
 void display (void) {
 	// This takes nonzero time to draw, but it looks neat.
 	struct line *tmp = buffer_start;
-	unsigned long long lim = buffer_size / thread_count;
+	unsigned long long lim = (buffer_size / thread_count) >> 1;
 	putchar('[');
 	for (unsigned long long i = 0; i < buffer_size; i++) {
 		if (i && 0 == (i % lim)) printf("]\n[");
@@ -36,7 +36,7 @@ void display (void) {
 		printf("%llu, ", queue[i]);
 	printf(
 		"%llu/%llu (%02.02f%%)\x1b[K\x1b[%lluA\r",
-		next_line, max.imag, next_line / (float)max.imag * 100, thread_count
+		next_line, max.imag, next_line / (float)max.imag * 100, thread_count << 1
 	);
 	/*/
 	// This is somewhat faster, but not as sweet looking.
@@ -149,7 +149,7 @@ int main (int argc, char **argv) {
 	sample = get_sampler(&argv[10]);
 
 	thread_count = atoi(argv[1]);
-	buffer_size = thread_count << 6;
+	buffer_size = thread_count << 7;
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
 	/* force GCC -ffast-math to be sensible */
