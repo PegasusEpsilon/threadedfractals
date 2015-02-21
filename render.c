@@ -70,7 +70,7 @@ int main (int argc, char **argv) {
 	}
 	map.map = mmap(NULL, map.size, PROT_READ, MAP_SHARED, map.fd, (size_t)0);
 	map.shift = atoi(argv[3]);
-	map.divider = atof(argv[4]);
+	map.divider = strtold(argv[4], NULL);
 	outfile = fopen(argv[5], "w");
 
 	for (;;) { /* ever */
@@ -80,9 +80,12 @@ int main (int argc, char **argv) {
 			if (feof(infile)) break; /* clean EOF, all done */
 			else fail(argv[1]); /* shit broke, throw a fit */
 		} /* got data, do work */
-		if (0 <= sample)
-			fwrite(map.map + 3 * (unsigned int)((long double)map.size + flatten(sample) * (long double)map.size / map.divider + map.shift) % map.size, (size_t)1, (size_t)3, outfile);
-		else
+		if (0 <= sample) {
+			fwrite(map.map + 3 * (unsigned long long)(
+				map.size + fabsl(flatten(sample)) *
+				map.size / map.divider + map.shift
+			) % map.size, (size_t)1, (size_t)3, outfile);
+		} else
 			fwrite(black, (size_t)1, (size_t)3, outfile);
 	}
 	fclose(infile);

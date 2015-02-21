@@ -16,7 +16,7 @@ struct region { long double complex center, radius; };
 struct pixel { long long unsigned real, imag; };
 
 struct trap {
-	double angle, dist, sin, cos, hyp;
+	long double angle, range, sin, cos, hyp;
 	uint32_t start;
 };
 

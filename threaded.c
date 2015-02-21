@@ -11,9 +11,10 @@
 #include "sample.h"
 #include "types.h"
 
+#define BUFFER_SIZE 100
 #define unlikely(x) __builtin_expect(x, 0)
 
-struct line { long double *data; bool ready; };
+struct line { long double *data; bool ready; bool assigned; };
 
 struct line *buffer_start, *buffer_end, *buffer_read, *buffer_write;
 bool buffer_full = false;
@@ -25,8 +26,10 @@ struct pixel max;
 __attribute__((hot always_inline)) static inline
 void display (void) {
 	putchar('[');
+	char c = buffer_start->ready ? '(' : ')';
 	for (struct line *tmp = buffer_start; tmp < buffer_end; tmp++)
-		putchar(tmp->ready ? '#' : ' ');
+		if (tmp->assigned) putchar(c = c == ')' ? '(' : ')');
+		else putchar(tmp->ready ? '#' : ' ');
 	printf("]\n");
 	for (unsigned long long i = 0; i < thread_count; i++)
 		printf("%llu, ", queue[i]);
@@ -44,9 +47,12 @@ __attribute__((hot always_inline)) static inline
 unsigned long long output (struct line **line) {
 	pthread_mutex_lock(&write_lock);
 
+	(*line)->assigned = false;
+
 	while (buffer_read->ready) {
+		buffer_full = false;
+		buffer_read->ready = false;
 		fwrite(buffer_read->data, sizeof(long double), max.real, output_file);
-		buffer_full = buffer_read->ready = false;
 		if (++buffer_read == buffer_end) buffer_read = buffer_start;
 	}
 
@@ -58,13 +64,13 @@ unsigned long long output (struct line **line) {
 		return -1;
 	}
 
-	*line = buffer_write;
-
-	if (++buffer_write == buffer_end) buffer_write = buffer_start;
-
-	if (buffer_write == buffer_read) buffer_full = true;
+	(*line) = buffer_write;
+	(*line)->assigned = true;
 
 	display();
+
+	if (++buffer_write == buffer_end) buffer_write = buffer_start;
+	if (buffer_write == buffer_read) buffer_full = true;
 
 	/* remember to increment inside the loop, which requires returning a copy */
 	unsigned long long copy = next_line++;
@@ -99,8 +105,7 @@ static void *thread (void *ptr) {
 	while ((unsigned long long)-1 != (
 		queue[thread] = output(iterate_line(&line, queue[thread]))
 	));
-	queue[thread] = 0;
-	pthread_exit(0);
+	queue[thread] = max.imag;
 	return NULL;
 }
 
@@ -129,6 +134,8 @@ int main (int argc, char **argv) {
 
 	if (11 > argc) usage(argv[0]);
 
+	sample = get_sampler(&argv[10]);
+
 	thread_count = atoi(argv[1]);
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
@@ -141,13 +148,12 @@ int main (int argc, char **argv) {
 	viewport.radius = tmp1 + tmp2 * I;
 	theta = strtold(argv[8], NULL);
 	output_file = fopen(argv[9], "w");
-	sample = get_sampler(argv[10], &argv[11]);
 
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
 	/* allocate output buffer */
-	unsigned long long buffer_size = 8 * thread_count;
+	unsigned long long buffer_size = BUFFER_SIZE;
 	buffer_read = buffer_start = calloc(buffer_size, sizeof(struct line));
 	buffer_write = buffer_read + thread_count;
 	buffer_end = buffer_start + buffer_size;
@@ -156,16 +162,25 @@ int main (int argc, char **argv) {
 
 	/* allocate process tracking space */
 	queue = calloc(thread_count, sizeof(unsigned long long));
-	pthread_t *threads = calloc(thread_count - 1, sizeof(pthread_t));
+	pthread_t *threads = calloc(thread_count, sizeof(pthread_t));
 
 	printf("spinning up %llu threads\n", thread_count);
+	for (unsigned long long i = 0; i < thread_count; i++) {
+		buffer_start[i].assigned = true;
+		queue[i] = i;
+	}
+	display();
 
-	for (next_line = 0; next_line < thread_count - 1; next_line++)
-		pthread_create(threads + next_line, NULL, &thread, (void *)next_line);
-	thread((void *)next_line++);
-	while (--thread_count) pthread_join(threads[thread_count], NULL);
+	next_line = thread_count;
+	for (unsigned long long i = 0; i < thread_count; i++)
+		pthread_create(&threads[i], NULL, &thread, (void *)i);
+
+	for (unsigned long long i = 0; i < thread_count; i++)
+		while (!pthread_join(threads[i], NULL));
+
 	display();
 	puts("\n\nDone!");
+	fflush(stdout);
 
 	free(threads);
 	free(queue);

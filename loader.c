@@ -11,16 +11,16 @@ __attribute__((cold)) static
 void dispose_sampler (void) { dlclose(sampler_handle); }
 
 __attribute__((cold))
-long double (*get_sampler (char *lib_name, char **args))(struct coordinates_4d *) {
+long double (*get_sampler (char **argv))(struct coordinates_4d *) {
 	long double (*fn)(struct coordinates_4d *);
 	void (*init)(char **);
 
 	if (sampler_handle)
 		die("Calling get_sampler twice will result in leaks. Exiting.");
 
-	if (!(sampler_handle = dlopen(lib_name, RTLD_LAZY))) {
+	if (!(sampler_handle = dlopen(argv[0], RTLD_LAZY))) {
 		char *tmp;
-		asprintf(&tmp, "./%s", lib_name);
+		asprintf(&tmp, "./%s", argv[0]);
 		sampler_handle = dlopen(tmp, RTLD_LAZY);
 		free(tmp);
 		if (!sampler_handle) die(dlerror());
@@ -40,7 +40,7 @@ long double (*get_sampler (char *lib_name, char **args))(struct coordinates_4d *
 	}
 
 	if ((init = (void (*)(char **))dlsym(sampler_handle, "init")))
-		init(args);
+		init(argv);
 #pragma GCC diagnostic pop
 
 	return fn;

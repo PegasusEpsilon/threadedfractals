@@ -1,18 +1,51 @@
 CC=cc
 CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
-DIVIDER=1
 THREADS=2
 MSAA=1
 SIZE_REAL=1920
 SIZE_IMAG=1080
 MSAA_REAL=$$(($(SIZE_REAL)*$(MSAA)))
 MSAA_IMAG=$$(($(SIZE_IMAG)*$(MSAA)))
+
+# nautilus
 CENTER_REAL=-0.7766729
 CENTER_IMAG=-0.13661091
 RADIUS_REAL=0.00016
+
+# full set
+CENTER_REAL=-0.75
+CENTER_IMAG=0
+RADIUS_REAL=2
+
+# bird of paradise
+#CENTER_REAL=0.3750001200618655
+#CENTER_IMAG=0.2166393884377127i
+#RADIUS_REAL=0.000000000002
+
 RADIUS_IMAG=$(shell echo "scale=40;$(RADIUS_REAL)*$(SIZE_IMAG)/$(SIZE_REAL)"|bc|sed -e 's/0*$$//')
 THETA=0
-SAMPLER=renormalized.so
+SHIFT=0
+
+# renormalized sampler
+#SAMPLER=renormalized.so
+#SAMPLER_ARGS=
+#DIVIDER=1
+#FLATTEN=-l
+
+# cross trap sampler
+SAMPLER=crosstrap.so
+# crosstrap.so range start angle
+SAMPLER_ARGS=0.5 1 0
+DIVIDER=1.5
+FLATTEN=
+
+# point trap sampler
+#SAMPLER=pointtrap.so
+# pointtrap.so range start
+#SAMPLER_ARGS=0.005 1
+#DIVIDER=10
+#FLATTEN=
+
 ARGS=$(MSAA_REAL) $(MSAA_IMAG) $(CENTER_REAL) $(CENTER_IMAG) $(RADIUS_REAL) $(RADIUS_IMAG) $(THETA)
 
 threaded.png:	pngify threaded.rgb
@@ -26,10 +59,10 @@ else
 endif
 
 threaded.msaa:	render threaded.map palette.bin
-	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
+	./render $(FLATTEN) threaded.map palette.bin $(SHIFT) $(DIVIDER) $@
 
 threaded.map:	threaded $(SAMPLER)
-	bash -c 'time ./$< $(THREADS) $(ARGS) $@ $(SAMPLER)'
+	bash -c 'time ./$< $(THREADS) $(ARGS) $@ $(SAMPLER) $(SAMPLER_ARGS)'
 
 threadless.png:	pngify threadless.rgb
 	./$^ $(SIZE_REAL) $(SIZE_IMAG) $@
@@ -42,13 +75,16 @@ else
 endif
 
 threadless.msaa:	render threadless.map palette.bin
-	./render -l threadless.map palette.bin 0 $(DIVIDER) $@
+	./render $(FLATTEN) threadless.map palette.bin $(SHIFT) $(DIVIDER) $@
 
 threadless.map:	threadless $(SAMPLER)
-	bash -c 'time ./$< $(ARGS) $@ $(SAMPLER)'
+	bash -c 'time ./$< $(ARGS) $@ $(SAMPLER) $(SAMPLER_ARGS)'
 
-palette.bin:	palette palette.txt
-	./palette palette.txt palette.bin
+palette.png:	pngify palette.bin
+	./$^ 45 34 $@
+
+palette.bin:	palette blueglow.txt
+	./$^ palette.bin
 
 pngify:	pngify.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lz
@@ -71,8 +107,8 @@ threadless:	threadless.c loader.h loader.o mapper.h mapper.o utils.h utils.o typ
 map:
 	rm sample.map || true
 
-renormalized.so:	renormalized.c
-	$(CC) -fPIC -shared $^ -o $@
+%.so: %.c
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 clean: map
 	rm *.o \
@@ -81,6 +117,6 @@ clean: map
 		threaded.rgb threadless.rgb \
 		threaded.map threadless.map \
 		threaded threadless \
-		renormalized.so \
+		renormalized.so pointtrap.so crosstrap.so \
 		palette render resample tiler pngify || \
 	true

@@ -79,6 +79,8 @@ void usage (char *myself) {
 int main (int argc, char **argv) {
 	if (10 > argc) usage(argv[0]);
 
+	sample = get_sampler(&argv[9]);
+
 	max.real = atoi(argv[1]);
 	max.imag = atoi(argv[2]);
 	/* force GCC -ffast-math to be sensible */
@@ -90,7 +92,6 @@ int main (int argc, char **argv) {
 	viewport.radius = tmp1 + tmp2 * I;
 	theta = strtold(argv[7], NULL);
 	output_file = fopen(argv[8], "w");
-	sample = get_sampler(argv[9], &argv[10]);
 
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &viewport);
