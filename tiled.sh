@@ -8,7 +8,7 @@ MSAA_REAL=$(($SIZE_REAL*$MSAA))
 MSAA_IMAG=$(($SIZE_IMAG*$MSAA))
 
 cleanup () { rm tiled.map tiled.msaa tiled.rgb; exit; }
-cleanup
+rm tiled.map tiled.msaa tiled.rgb
 mkfifo tiled.rgb tiled.msaa tiled.map
 trap cleanup 1 2 4 5 6 7 8 11 13 14 15
 
