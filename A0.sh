@@ -1,14 +1,6 @@
 #!/bin/bash
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
-MSAA=16
+# any value left undefined will be set by config.sh instead
+
 SIZE_REAL=$((144*470))
 SIZE_IMAG=$((144*335))
-CENTER_REAL=-0.7766729
-CENTER_IMAG=-0.13661091
-RADIUS_REAL=0.00016
-RADIUS_IMAG=$(echo "scale=40;$RADIUS_REAL*$SIZE_IMAG/$SIZE_REAL"|bc|sed -e 's/0*$//')
-THETA=0
-DIVIDER=1
-MSAA_REAL=$(($SIZE_REAL*$MSAA))
-MSAA_IMAG=$(($SIZE_IMAG*$MSAA))
