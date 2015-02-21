@@ -11,7 +11,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define BUFFER_SIZE 100
 #define unlikely(x) __builtin_expect(x, 0)
 
 struct line { long double *data; bool ready; bool assigned; };
@@ -19,22 +18,34 @@ struct line { long double *data; bool ready; bool assigned; };
 struct line *buffer_start, *buffer_end, *buffer_read, *buffer_write;
 bool buffer_full = false;
 FILE *output_file;
-unsigned long long next_line = 0;
-unsigned long long thread_count, *queue;
+unsigned long long buffer_size, thread_count, *queue, next_line = 0, buffer_waiting = 0;
 struct pixel max;
 
 __attribute__((hot always_inline)) static inline
 void display (void) {
+	// This takes nonzero time to draw, but it looks neat.
+	struct line *tmp = buffer_start;
+	unsigned long long lim = buffer_size / thread_count;
 	putchar('[');
-	for (struct line *tmp = buffer_start; tmp < buffer_end; tmp++)
-		putchar(tmp->ready ? '#' : tmp->assigned ? '|' : ' ');
-	printf("]\n");
+	for (unsigned long long i = 0; i < buffer_size; i++) {
+		if (i && 0 == (i % lim)) printf("]\n[");
+		putchar(tmp[i].ready ? '-' : tmp[i].assigned ? '|' : ' ');
+	}
+	puts("]");
 	for (unsigned long long i = 0; i < thread_count; i++)
 		printf("%llu, ", queue[i]);
 	printf(
-		"%llu/%llu (%02.02f%%)\x1b[K\x1b[A\r",
-		next_line, max.imag, next_line / (float)max.imag * 100
+		"%llu/%llu (%02.02f%%)\x1b[K\x1b[%lluA\r",
+		next_line, max.imag, next_line / (float)max.imag * 100, thread_count
 	);
+	/*/
+	// This is somewhat faster, but not as sweet looking.
+	printf("progress: %llu/%llu (%02.02f%% done), buffer: %llu/%llu (%02.02f%% full)\x1b[K\r",
+		next_line, max.imag, next_line / (float)max.imag * 100,
+		buffer_waiting, buffer_size, buffer_waiting / (float)buffer_size * 100
+	);
+	// */
+
 	fflush(stdout);
 }
 
@@ -47,7 +58,10 @@ unsigned long long output (struct line **line) {
 
 	(*line)->assigned = false;
 
+	buffer_waiting++;
+
 	while (buffer_read->ready) {
+		buffer_waiting--;
 		buffer_full = false;
 		buffer_read->ready = false;
 		fwrite(buffer_read->data, sizeof(long double), max.real, output_file);
@@ -135,6 +149,7 @@ int main (int argc, char **argv) {
 	sample = get_sampler(&argv[10]);
 
 	thread_count = atoi(argv[1]);
+	buffer_size = thread_count << 6;
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
 	/* force GCC -ffast-math to be sensible */
@@ -151,7 +166,6 @@ int main (int argc, char **argv) {
 	pixelsize = calculate_pixelsize(&max, &viewport);
 
 	/* allocate output buffer */
-	unsigned long long buffer_size = BUFFER_SIZE;
 	buffer_read = buffer_start = calloc(buffer_size, sizeof(struct line));
 	buffer_write = buffer_read + thread_count;
 	buffer_end = buffer_start + buffer_size;
@@ -177,7 +191,8 @@ int main (int argc, char **argv) {
 		while (!pthread_join(threads[i], NULL));
 
 	display();
-	puts("\n\nDone!");
+	for (unsigned long long i = 0; i <= thread_count; i++) putchar('\n');
+	puts("Done!");
 	fflush(stdout);
 
 	free(threads);
