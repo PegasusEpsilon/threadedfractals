@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-long double sample (struct coordinates_4d *);
+long double (*sample) (struct coordinates_4d *);
 
 #endif /* SAMPLE_H */

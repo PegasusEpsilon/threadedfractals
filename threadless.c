@@ -5,6 +5,7 @@
 #include <stdarg.h> 	/* va_list, va_start(), va_end() */
 #include <stdbool.h>	/* bool, true, false */
 
+#include "loader.h"
 #include "mapper.h"
 #include "sample.h"
 #include "types.h"
@@ -56,7 +57,8 @@ static void thread (void) {
 __attribute__((noreturn))
 void _cold usage (char *myself) {
 	puts("Unthreaded Mandelbrot sampler\n");
-	printf("Usage: %s WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
+	printf("Usage: %s SAMPLER WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE\n\n", myself);
+	puts("	SAMPLER	shared object containing sampler function");
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
 	puts("	center coordinates (CEN_REAL, CEN_IMAG)");
@@ -72,20 +74,21 @@ void _cold usage (char *myself) {
 }
 
 int main (int argc, char **argv) {
+	if (10 > argc) usage(argv[0]);
 
-	if (9 > argc) usage(argv[0]);
-
-	max.real = atoi(argv[1]);
-	max.imag = atoi(argv[2]);
+	sample = get_sampler(argv[1]);
+	max.real = atoi(argv[2]);
+	max.imag = atoi(argv[3]);
 	/* force GCC -ffast-math to be sensible */
-	long double tmp1 = strtold(argv[3], NULL);
-	long double tmp2 = strtold(argv[4], NULL);
+	long double tmp1 = strtold(argv[4], NULL);
+	long double tmp2 = strtold(argv[5], NULL);
 	viewport.center = tmp1 - tmp2 * I;
-	tmp1 = strtold(argv[5], NULL);
-	tmp2 = strtold(argv[6], NULL);
+	tmp1 = strtold(argv[6], NULL);
+	tmp2 = strtold(argv[7], NULL);
 	viewport.radius = tmp1 + tmp2 * I;
-	theta = strtold(argv[7], NULL);
-	output_file = fopen(argv[8], "w");
+	theta = strtold(argv[8], NULL);
+	output_file = fopen(argv[9], "w");
+	printf("outfile: %s\n", argv[9]); fflush(stdout);
 
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &viewport);

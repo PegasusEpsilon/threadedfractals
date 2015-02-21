@@ -1,6 +1,5 @@
 CC=cc
 CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
-LIBS=-lm
 DIVIDER=1
 THREADS=2
 MSAA=1
@@ -28,7 +27,7 @@ endif
 threaded.msaa:	render threaded.map palette.bin
 	./render -l threaded.map palette.bin 0 $(DIVIDER) $@
 
-threaded.map:	threaded
+threaded.map:	threaded renormalized.so
 	bash -c 'time ./$^ $(THREADS) $(ARGS) $@'
 
 threadless.png:	pngify threadless.rgb
@@ -44,7 +43,7 @@ endif
 threadless.msaa:	render threadless.map palette.bin
 	./render -l threadless.map palette.bin 0 $(DIVIDER) $@
 
-threadless.map:	threadless
+threadless.map:	threadless renormalized.so
 	bash -c 'time ./$^ $(ARGS) $@'
 
 palette.bin:	palette palette.txt
@@ -62,14 +61,17 @@ render:	render.c
 palette:	palette.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-threaded:	threaded.c sample.h sample.o mapper.h mapper.o types.h
-	$(CC) $(CFLAGS) $^ -o $@ -lm -lpthread
+threaded:	threaded.c loader.h loader.o mapper.h mapper.o utils.h utils.o types.h sample.h
+	$(CC) $(CFLAGS) $^ -o $@ -lm -lpthread -ldl
 
-threadless:	threadless.c sample.h sample.o mapper.h mapper.o types.h
-	$(CC) $(CFLAGS) $^ -o $@ -lm
+threadless:	threadless.c loader.h loader.o mapper.h mapper.o utils.h utils.o types.h sample.h
+	$(CC) $(CFLAGS) $^ -o $@ -lm -ldl
 
 map:
 	rm sample.map || true
+
+renormalized.so:	renormalized.c
+	$(CC) -fPIC -shared $^ -o $@
 
 clean: map
 	rm *.o \
