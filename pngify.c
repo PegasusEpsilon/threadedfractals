@@ -23,7 +23,7 @@ const uint8_t zlib_header[] = { 0x78, 0xda };
 
 struct png_chunk {
 	uint32_t size;
-	uint32_t typecode;
+	uint32_t type;
 } __attribute__((packed));
 
 struct png_ihdr {
@@ -48,6 +48,14 @@ void usage (const char *restrict const myself) {
 }
 
 __attribute__((hot pure always_inline))
+static inline void crc_write (
+	const void *data, size_t size, FILE *stream, uint32_t *crc
+) {
+	*crc = crc32(*crc, data, size);
+	if (1 != fwrite(data, size, 1, stream) || ferror(stream)) fail("crc_write");
+}
+
+__attribute__((hot pure always_inline))
 static inline void fwrite_chunk (
 	struct png_chunk *restrict const chunk,
 	FILE *restrict const file
@@ -55,7 +63,7 @@ static inline void fwrite_chunk (
 	/* save this for later */
 	size_t size = chunk->size;
 	/* CRC does not include the chunk size field */
-	uint32_t crc = htonl(crc32(0, &chunk->typecode, (size - sizeof(chunk->size))));
+	uint32_t crc = htonl(crc32(0, &chunk->type, (size - sizeof(chunk->size))));
 	/* chunk size does not count header */
 	chunk->size = htonl(size - sizeof(struct png_chunk));
 	/* write chunk */
@@ -78,17 +86,15 @@ static inline int output (
 	stream->avail_out = Z_CHUNK;
 
 	if (Z_STREAM_ERROR == deflate(stream, flush)) die("zlib killed itself");
-	if ((ready = Z_CHUNK - stream->avail_out)) {
-		*crc = crc32(*crc, buffer, ready);
-		if (1 != fwrite(buffer, ready, 1, file)) fail("write");
-	}
+	if ((ready = Z_CHUNK - stream->avail_out))
+		crc_write(buffer, ready, file, crc);
 	return !stream->avail_out;
 }
 
 int main (int argc, char **argv) {
 	FILE *ifile, *ofile;
 	long idat_start, idat_size;
-	uint32_t crc, height, width;
+	uint32_t crc = 0, height, width;
 
 	z_stream stream = {
 		.zalloc = Z_NULL,
@@ -100,18 +106,34 @@ int main (int argc, char **argv) {
 	struct png_ihdr ihdr = {
 		.header = {
 			.size = sizeof(struct png_ihdr),
-			.typecode = *(uint32_t *)"IHDR"
+			.type = *(uint32_t *)"IHDR"
 		},
+		/* we can easily encode other pixel formats, but we only care about
+		 * 24bpp truecolor images at the moment.
+		 */
 		.bit_depth = 8,	/* 24bpp */
 		.color_type = 2,	/* color */
+		/* the PNG spec allows only one compression method. despite the spec's
+		 * statements, the stream must be a full zlib stream, with zlib header,
+		 * adler32 footer (for the decompressed data), and an extra additional
+		 * CRC32 checksum (for compressed data) per the PNG chunk spec proper.
+		 */
 		.compression_method = 0,	/* zlib/32767 */
+		/* we don't bother with any filtering, just shoving the raw pixel data
+		 * to zlib. We *may* get better results with filtering, but exploring
+		 * that problem space takes more time than we're willing to spend on
+		 * this simple application of the PNG spec.
+		 */
 		.filter_method = 0,	/* adaptive */
+		/* interlacing brings a lot of code complexity,
+		 * with very limited benefit. don't bother.
+		 */
 		.interlace_method = 0	/* progressive scan */
 	};
 
 	struct png_iend iend = { .header = {
 		.size = sizeof(struct png_iend),
-		.typecode = *(uint32_t *)"IEND"
+		.type = *(uint32_t *)"IEND"
 	} };
 
 	/* Turn on verbose, maybe */
@@ -157,44 +179,29 @@ int main (int argc, char **argv) {
 	 */
 	fseek(ofile, sizeof(uint32_t), SEEK_CUR);
 
-	/* Start up CRC calculation */
-	crc = crc32(0, "IDAT", 4);
-
-	/* Write the IDAT typecode */
-	if (1 != fwrite("IDAT", 4, 1, ofile) || ferror(ofile)) fail(argv[4]);
+	/* write "IDAT" */
+	crc_write("IDAT", 4, ofile, &crc);
 
 	/* Start counting IDAT size from here */
 	idat_start = ftell(ofile);
 
 	/* Start up zlib stream compressor */
-	if (Z_OK != deflateInit2(&stream, 9, Z_DEFLATED, -15, 9, Z_DEFAULT_STRATEGY))
+	if (Z_OK != deflateInit2(&stream, 9, Z_DEFLATED, 15, 9, Z_DEFAULT_STRATEGY))
 		die("failed to initialize zlib");
-
-	/* Remember to CRC every single byte */
-	crc = crc32(crc, zlib_header, 2);
-	fwrite(zlib_header, 2, 1, ofile);
-	//fwrite("compressed data\n", strlen("compressed data\n"), 1, ofile);
 
 	/* Compress the stream */
 	uint8_t input[Z_CHUNK] = { 0 };
-	for (uint32_t i = 0; i < height; i++) {
+	uint32_t i = 0; int flush = Z_NO_FLUSH;;
+	while (i < height) {
 		stream.next_in = input;
 		stream.avail_in = (uInt)1 + 3 * fread(&input[1], 3, width, ifile);
 		if (ferror(ifile)) fail(argv[1]);
-		while (output(&stream, Z_NO_FLUSH, ofile, &crc));
+		if (++i == height) flush = Z_FINISH;
+		while (output(&stream, flush, ofile, &crc));
 	}
-	/* Finish up
-	 * NOTE: I don't know why this final single null is actually required.
-	 * It's not in the PNG spec, as far as I can see, but leaving it out,
-	 * and just flushing the pending compressed data to disk instead,
-	 * actually breaks the output file.
-	 */
-	stream.next_in = input;
-	stream.avail_in = 1;
-	output(&stream, Z_FINISH, ofile, &crc);
+	/* Finish up */
 	fclose(ifile);
 	deflateEnd(&stream);
-	//fwrite("\ncompressed data", strlen("\ncompressed data"), 1, ofile);
 
 	/* calculate IDAT size */
 	idat_start = ftell(ofile) - idat_start;
