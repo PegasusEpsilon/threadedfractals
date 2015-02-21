@@ -124,6 +124,10 @@ int main (int argc, char **argv) {
 		 * with very limited benefit. don't bother.
 		 */
 		.interlace_method = 0	/* progressive scan */
+		/* NOTE: Despite the radical simplification of the potential outputs by
+		 * these self-imposed restraints on filtering and interlacing, we still
+		 * beat ImageMagick's PNG writer by a decent margin.
+		 */
 	};
 
 	struct png_iend iend = { .header = {
