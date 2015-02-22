@@ -57,7 +57,7 @@ void thread (void) {
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
 	puts("Unthreaded Mandelbrot sampler\n");
-	printf("Usage: %s WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE SAMPLER\n\n", myself);
+	printf("Usage: %s WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
 	puts("	center coordinates (CEN_REAL, CEN_IMAG)");
