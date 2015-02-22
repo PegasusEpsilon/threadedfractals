@@ -1,0 +1,11 @@
+LEN 1530
+
+RGB 0 0 0 0 # black
+
+RED .85 .5
+BLU .85 1
+
+RED .95 1
+GRN .95 0
+
+RGB 1 1 1 1 # white
