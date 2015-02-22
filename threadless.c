@@ -10,8 +10,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define unlikely(x) __builtin_expect(x, 0)
-
 long double *buffer;
 FILE *output_file;
 unsigned long long next_line = 0;

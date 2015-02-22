@@ -11,8 +11,6 @@
 #include "sample.h"
 #include "types.h"
 
-#define unlikely(x) __builtin_expect(x, 0)
-
 struct line { long double *data; bool ready; bool assigned; };
 
 struct line *buffer_start, *buffer_end, *buffer_read, *buffer_write;
@@ -29,7 +27,7 @@ void display (void) {
 	putchar('[');
 	for (unsigned long long i = 0; i < buffer_size; i++) {
 		if (i && 0 == (i % lim)) printf("]\n[");
-		putchar(tmp[i].ready ? '-' : tmp[i].assigned ? '|' : ' ');
+		putchar(tmp[i].ready ? '=' : tmp[i].assigned ? '|' : ' ');
 	}
 	puts("]");
 	for (unsigned long long i = 0; i < thread_count; i++)
@@ -191,6 +189,7 @@ int main (int argc, char **argv) {
 		while (!pthread_join(threads[i], NULL));
 
 	display();
+	thread_count <<= 1;
 	for (unsigned long long i = 0; i <= thread_count; i++) putchar('\n');
 	puts("Done!");
 	fflush(stdout);
