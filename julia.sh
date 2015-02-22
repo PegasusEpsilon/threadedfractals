@@ -3,11 +3,13 @@
 source config.sh
 
 # julia rejiggery
+TRAP_RANGE=$(echo "scale=40;$TRAP_RANGE/4"|bc|sed -e 's/0*$//')
+SAMPLER_ARGS="$TRAP_RANGE $TRAP_START $TRAP_ANGLE"
 SAMPLER_ARGS="$CENTER_REAL $CENTER_IMAG $SAMPLER $SAMPLER_ARGS"
 SAMPLER=julia.so
 CENTER_REAL=0
 CENTER_IMAG=0
-DIVIDER=$(echo "scale=40;$DIVIDER/2"|bc|sed -e 's/0*$//')
+DIVIDER=$(echo "scale=40;$DIVIDER/4"|bc|sed -e 's/0*$//')
 echo $DIVIDER
 
 RADIUS_IMAG=$(echo "scale=40;$RADIUS_REAL*$SIZE_IMAG/$SIZE_REAL"|bc|sed -e 's/0*$//')
