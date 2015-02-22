@@ -1,0 +1,4 @@
+LEN 1530
+
+RGB 0 0 0 0 # black
+RGB 1 1 1 1 # white

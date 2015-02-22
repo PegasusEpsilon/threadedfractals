@@ -1,0 +1,10 @@
+# Fire palette
+
+LEN	1530
+
+RED	0.0000	1 # white
+BLU	0.1666	0 # yellow
+GRN	0.3333	0 # red
+RED	0.5000	0 # black
+BLU	0.6666	1 # blue
+GRN	0.8333	1 # cyan
