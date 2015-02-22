@@ -20,7 +20,8 @@ long double (*get_sampler (char **argv))(struct coordinates_4d *) {
 
 	if (!(sampler_handle = dlopen(argv[0], RTLD_LAZY))) {
 		char *tmp;
-		asprintf(&tmp, "./%s", argv[0]);
+		if (-1 == asprintf(&tmp, "./%s", argv[0]))
+			die("asprintf() threw an error. Giving up.");
 		sampler_handle = dlopen(tmp, RTLD_LAZY);
 		free(tmp);
 		if (!sampler_handle) die(dlerror());
