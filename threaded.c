@@ -64,12 +64,13 @@ unsigned long long output (struct line **line) {
 		buffer_read->ready = false;
 		fwrite(buffer_read->data, sizeof(long double), max.real, output_file);
 		if (++buffer_read == buffer_end) buffer_read = buffer_start;
+		pthread_cond_broadcast(&data_written);
 	}
 
-	if (!buffer_full) pthread_cond_broadcast(&data_written);
-	else while (buffer_full) pthread_cond_wait(&data_written, &write_lock);
+	while (buffer_full) pthread_cond_wait(&data_written, &write_lock);
 
 	if (next_line == max.imag) {
+		/* no work left */
 		pthread_mutex_unlock(&write_lock);
 		return -1;
 	}
