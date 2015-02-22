@@ -1,6 +1,8 @@
 old
 pasture
 *.o
+*.so
+*.bin
 *.png
 threaded
 threadless
