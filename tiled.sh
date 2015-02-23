@@ -7,6 +7,9 @@ RADIUS_IMAG=$(echo "scale=40;$RADIUS_REAL*$SIZE_IMAG/$SIZE_REAL"|bc|sed -e 's/0*
 MSAA_REAL=$(($SIZE_REAL*$MSAA))
 MSAA_IMAG=$(($SIZE_IMAG*$MSAA))
 SAMPLER="julia -0.7766729 -0.13661091 crosstrap 0.125 1 0"
+DIVIDER=.375
+FLATTEN=
+
 
 cleanup () { rm tiled.map tiled.msaa tiled.rgb; exit; }
 rm tiled.map tiled.msaa tiled.rgb
@@ -20,3 +23,4 @@ make palette threaded modules render resample tiler pngify || exit
 ./render $FLATTEN tiled.map palette.bin 0 $DIVIDER tiled.msaa &
 echo ./threaded $THREADS $MSAA_REAL $MSAA_IMAG tiled.map $SAMPLER
 time ./threaded $THREADS $MSAA_REAL $MSAA_IMAG tiled.map $SAMPLER
+cleanup
