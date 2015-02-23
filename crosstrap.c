@@ -20,7 +20,7 @@ void usage (char *myself) {
 	puts("	START	iteration on which to start trapping");
 	puts("		Note: higher values remove more foreground lines");
 	puts("	ANGLE	angle of the cross, 0-90");
-	exit(0);
+	exit(1);
 }
 
 __attribute__((cold))

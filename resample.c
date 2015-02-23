@@ -25,7 +25,7 @@ typedef struct {
 __attribute__((noreturn))
 void usage (char *myself) {
 	printf("Usage: %s [-v] infile width factor outfile\n", myself);
-	exit(0);
+	exit(1);
 }
 
 RGB24 downsample (size_t px_width, RGB24 **samples) {

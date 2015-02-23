@@ -18,9 +18,11 @@ long double (*get_sampler (char **argv))(long double complex *) {
 	if (sampler_handle)
 		die("Calling get_sampler twice will result in leaks. Exiting.");
 
+	char *tmp;
+	if (-1 == asprintf(&tmp, "%s.so", argv[0]))
+		die("asprintf() threw an error. Giving up.");
 	if (!(sampler_handle = dlopen(argv[0], RTLD_LAZY))) {
-		char *tmp;
-		if (-1 == asprintf(&tmp, "./%s", argv[0]))
+		if (-1 == asprintf(&tmp, "./%s.so", argv[0]))
 			die("asprintf() threw an error. Giving up.");
 		sampler_handle = dlopen(tmp, RTLD_LAZY);
 		free(tmp);

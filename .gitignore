@@ -3,6 +3,9 @@ pasture
 *.o
 *.so
 *.bin
+*.map
+*.msaa
+*.rgb
 *.png
 threaded
 threadless

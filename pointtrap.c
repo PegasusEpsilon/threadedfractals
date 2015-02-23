@@ -19,7 +19,7 @@ void usage (char *myself) {
 	puts("		Note: larger ranges make bigger points");
 	puts("	START	iteration on which to start trapping");
 	puts("		Note: higher values remove more foreground lines");
-	exit(0);
+	exit(1);
 }
 
 __attribute__((cold))

@@ -91,9 +91,8 @@ unsigned long long output (struct line **line) {
 	return copy;
 }
 
-long double theta;
 long double complex pixelsize;
-struct region viewport;
+long double complex radius; /* FIXME: i do not need to exist anymore */
 __attribute__((hot always_inline)) static inline
 struct line **iterate_line (
 	struct line **line, unsigned long long imag
@@ -102,7 +101,7 @@ struct line **iterate_line (
 	struct pixel this = { .imag = imag };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
-		point = pixel2vector(&this, &pixelsize, &viewport, &theta);
+		point = pixel2vector(&this, &pixelsize, &radius);
 		(*line)->data[this.real] = sample(&point);
 	}
 	(*line)->ready = true;
@@ -123,46 +122,32 @@ static void *thread (void *ptr) {
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
 	puts("Threaded Mandelbrot sampler\n");
-	printf("Usage: %s THREADS WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE SAMPLER ARGS\n\n", myself);
+	printf("Usage: %s THREADS WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	THREADS	how many threads to spawn");
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
-	puts("	center coordinates (CEN_REAL, CEN_IMAG)");
-	puts("		real     	horizontal center of the sampled area on the complex plane");
-	puts("		imaginary	vertical \"");
-	puts("	radius dimensions (RAD_REAL, RAD_IMAG)");
-	puts("		real    	width of the sampled area on the complex plane");
-	puts("		imaginary	height \"");
-	puts("	THETA	angle to rotate the sample matrix around the center coordinate");
 	puts("	OUTFILE	name of file to write output to");
 	puts("	SAMPLER	shared object file containing sampler function");
 	puts("	ARGS	any extra arguments required by the sampler");
 	puts("\nReport bugs to pegasus@pimpninjas.org");
-	exit(0);
+	exit(1);
 }
 
 int main (int argc, char **argv) {
 
-	if (10 > argc) usage(argv[0]);
+	if (6 > argc) usage(argv[0]);
 
-	sample = get_sampler(&argv[10]);
+	sample = get_sampler(&argv[5]);
 
 	thread_count = atoi(argv[1]);
 	buffer_size = thread_count << 7;
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
-	/* force GCC -ffast-math to be sensible */
-	long double tmp1 = strtold(argv[4], NULL);
-	long double tmp2 = strtold(argv[5], NULL);
-	viewport.center = tmp1 - tmp2 * I;
-	tmp1 = strtold(argv[6], NULL);
-	tmp2 = strtold(argv[7], NULL);
-	viewport.radius = tmp1 + tmp2 * I;
-	theta = strtold(argv[8], NULL);
-	output_file = fopen(argv[9], "w");
+	radius = 2 + 2 * max.imag / max.real * I;
+	output_file = fopen(argv[4], "w");
 
 	/* cache some math */
-	pixelsize = calculate_pixelsize(&max, &viewport);
+	pixelsize = calculate_pixelsize(&max, &radius);
 
 	/* allocate output buffer */
 	buffer_read = buffer_start = calloc(buffer_size, sizeof(struct line));

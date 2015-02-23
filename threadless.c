@@ -32,16 +32,15 @@ void output (void) {
 	next_line++;
 }
 
-long double theta;
 long double complex pixelsize;
-struct region viewport;
+long double complex radius;
 __attribute__((hot always_inline)) static inline
 void iterate_line () {
 	long double complex point;
 	struct pixel this = { .imag = next_line };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
-		point = pixel2vector(&this, &pixelsize, &viewport, &theta);
+		point = pixel2vector(&this, &pixelsize, &radius);
 		buffer[this.real] = sample(&point);
 	}
 }
@@ -57,42 +56,28 @@ void thread (void) {
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
 	puts("Unthreaded Mandelbrot sampler\n");
-	printf("Usage: %s WIDTH HEIGHT CEN_REAL CEN_IMAG RAD_REAL RAD_IMAG THETA OUTFILE SAMPLER ARGS\n\n", myself);
+	printf("Usage: %s WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");
-	puts("	center coordinates (CEN_REAL, CEN_IMAG)");
-	puts("		real     	horizontal center of the sampled area on the complex plane");
-	puts("		imaginary	vertical \"");
-	puts("	radius dimensions (RAD_REAL, RAD_IMAG)");
-	puts("		real    	width of the sampled area on the complex plane");
-	puts("		imaginary	height \"");
-	puts("	THETA	angle to rotate the sample matrix around the center coordinate");
 	puts("	OUTFILE	name of file to write output to");
 	puts("	SAMPLER	shared object file containing sampler function");
 	puts("	ARGS	any extra arguments required by the sampler");
 	puts("\nReport bugs to pegasus@pimpninjas.org");
-	exit(0);
+	exit(1);
 }
 
 int main (int argc, char **argv) {
-	if (10 > argc) usage(argv[0]);
+	if (5 > argc) usage(argv[0]);
 
-	sample = get_sampler(&argv[9]);
+	sample = get_sampler(&argv[4]);
 
 	max.real = atoi(argv[1]);
 	max.imag = atoi(argv[2]);
-	/* force GCC -ffast-math to be sensible */
-	long double tmp1 = strtold(argv[3], NULL);
-	long double tmp2 = strtold(argv[4], NULL);
-	viewport.center = tmp1 - tmp2 * I;
-	tmp1 = strtold(argv[5], NULL);
-	tmp2 = strtold(argv[6], NULL);
-	viewport.radius = tmp1 + tmp2 * I;
-	theta = strtold(argv[7], NULL);
-	output_file = fopen(argv[8], "w");
+	radius = 2 + 2 * max.imag / max.real * I;
+	output_file = fopen(argv[3], "w");
 
 	/* cache some math */
-	pixelsize = calculate_pixelsize(&max, &viewport);
+	pixelsize = calculate_pixelsize(&max, &radius);
 
 	/* allocate output buffer */
 	buffer = calloc(max.real, sizeof(long double));
