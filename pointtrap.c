@@ -26,17 +26,16 @@ __attribute__((cold))
 void init (char **argv) {
 	/* count args */
 	int argc = 0;
-	while (argv[argc++]);
-	printf("%s argc: %d\n", argv[0], argc);
-	if (4 > argc) usage(argv[0]);
+	while (argv[++argc]);
+	if (3 > argc) usage(argv[0]);
 	trap.range = strtold(argv[1], NULL);
 	trap.start = atoi(argv[2]);
 }
 
 __attribute__((pure hot))
-long double sample (struct coordinates_4d *coordinates) {
-	long double complex z = coordinates->z, c = coordinates->c,
-	                   oz = 255 + 255 * I;
+long double sample (long double complex *z_ptr, long double complex *c_ptr) {
+	long double complex z = *z_ptr, c = *c_ptr;
+	long double complex oz = 255 + 255 * I;
 	unsigned i, deadline = 1;
 	long double d = (long double)((unsigned long long)-1);
 

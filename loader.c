@@ -11,8 +11,8 @@ __attribute__((cold)) static
 void dispose_sampler (void) { dlclose(sampler_handle); }
 
 __attribute__((cold))
-long double (*get_sampler (char **argv))(struct coordinates_4d *) {
-	long double (*fn)(struct coordinates_4d *);
+long double (*get_sampler (char **argv))(long double complex *) {
+	long double (*fn)(long double complex *);
 	void (*init)(char **);
 
 	if (sampler_handle)
@@ -35,7 +35,7 @@ long double (*get_sampler (char **argv))(struct coordinates_4d *) {
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
-	if (!(fn = (long double (*)(struct coordinates_4d *))dlsym(sampler_handle, "sample"))) {
+	if (!(fn = (long double (*)(long double complex *))dlsym(sampler_handle, "sample"))) {
 		char *tmp = dlerror();
 		die(tmp ? tmp : "NULL sampler not allowed");
 	}

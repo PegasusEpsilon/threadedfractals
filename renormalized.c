@@ -23,12 +23,12 @@ bool inset (long double complex c) {
 }
 
 __attribute__((pure hot))
-long double sample (struct coordinates_4d *coordinates) {
-	long double complex z = coordinates->z, c = coordinates->c,
-	                   oz = 255 + 255 * I;
+long double sample (long double complex *z_ptr, long double complex *c_ptr) {
+	long double complex z = *z_ptr, c = *c_ptr;
+	long double complex oz = 255 + 255 * I;
 	unsigned i, deadline = 1;
 
-	if (inset(coordinates->c)) return -1;
+	if (inset(c)) return -1;
 
 	for (i = 0; likely(i != (unsigned)-1); i++) {
 		if (unlikely(cabsl(z) > ESCAPE)) break;

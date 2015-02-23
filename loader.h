@@ -1,11 +1,11 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include "types.h"
+#include <complex.h>
 
 void *sampler_handle;
 
 __attribute__((cold))
-long double (*get_sampler (char **))(struct coordinates_4d *);
+long double (*get_sampler (char **))(long double complex *);
 
 #endif /* LOADER_H */
