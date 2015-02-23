@@ -46,10 +46,10 @@ modules:
 
 clean:
 	rm *.o \
-		threaded.png threadless.png palette.png \
-		threaded.msaa threadless.msaa palette.bin \
-		threaded.rgb threadless.rgb \
-		threaded.map threadless.map \
+		julia.png threaded.png threadless.png palette.png \
+		julia.rgb threaded.rgb threadless.rgb \
+		julia.msaa threaded.msaa threadless.msaa palette.bin \
+		julia.map threaded.map threadless.map \
 		threaded threadless \
 		renormalized.so pointtrap.so crosstrap.so \
 		mandelbrot.so julia.so escape_count.so \
