@@ -22,5 +22,6 @@ make palette.bin threaded render resample pngify $SAMPLER || exit
 ./pngify threaded.rgb $SIZE_REAL $SIZE_IMAG threaded.png &
 ./resample threaded.msaa $SIZE_REAL $MSAA threaded.rgb &
 ./render $FLATTEN threaded.map palette.bin 0 $DIVIDER threaded.msaa &
+echo ./threaded $THREADS $MSAA_REAL $MSAA_IMAG $CENTER_REAL $CENTER_IMAG $RADIUS_REAL $RADIUS_IMAG $THETA threaded.map $SAMPLER $SAMPLER_ARGS
 time ./threaded $THREADS $MSAA_REAL $MSAA_IMAG $CENTER_REAL $CENTER_IMAG $RADIUS_REAL $RADIUS_IMAG $THETA threaded.map $SAMPLER $SAMPLER_ARGS
 cleanup

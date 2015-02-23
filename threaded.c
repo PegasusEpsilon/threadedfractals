@@ -98,12 +98,12 @@ __attribute__((hot always_inline)) static inline
 struct line **iterate_line (
 	struct line **line, unsigned long long imag
 ) {
-	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
+	long double complex point;
 	struct pixel this = { .imag = imag };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
-		coordinates.c = pixel2vector(&this, &pixelsize, &viewport, &theta);
-		(*line)->data[this.real] = sample(&coordinates);
+		point = pixel2vector(&this, &pixelsize, &viewport, &theta);
+		(*line)->data[this.real] = sample(&point);
 	}
 	(*line)->ready = true;
 	return line;
@@ -143,7 +143,7 @@ void usage (char *myself) {
 
 int main (int argc, char **argv) {
 
-	if (11 > argc) usage(argv[0]);
+	if (10 > argc) usage(argv[0]);
 
 	sample = get_sampler(&argv[10]);
 
