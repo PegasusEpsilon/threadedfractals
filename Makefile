@@ -110,6 +110,10 @@ map:
 %.so: %.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
+mandelbrot.so:	mandelbrot.c loader.c utils.c
+	make crosstrap.so pointtrap.so renormalized.so
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
+
 julia.so:	julia.c loader.c utils.c
 	make crosstrap.so pointtrap.so renormalized.so
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
@@ -121,6 +125,7 @@ clean: map
 		threaded.rgb threadless.rgb \
 		threaded.map threadless.map \
 		threaded threadless \
-		renormalized.so pointtrap.so crosstrap.so julia.so \
+		renormalized.so pointtrap.so crosstrap.so \
+		mandelbrot.so julia.so \
 		palette render resample tiler pngify || \
 	true

@@ -1,8 +1,8 @@
 #ifndef SAMPLE_H
 #define SAMPLE_H
 
-#include "types.h"
+#include <complex.h>
 
-long double (*sample) (struct coordinates_4d *);
+long double (*sample) (long double complex *);
 
 #endif /* SAMPLE_H */

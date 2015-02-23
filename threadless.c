@@ -37,12 +37,12 @@ long double complex pixelsize;
 struct region viewport;
 __attribute__((hot always_inline)) static inline
 void iterate_line () {
-	struct coordinates_4d coordinates = { .z = 0 + 0 * I };
+	long double complex point;
 	struct pixel this = { .imag = next_line };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
-		coordinates.c = pixel2vector(&this, &pixelsize, &viewport, &theta);
-		buffer[this.real] = sample(&coordinates);
+		point = pixel2vector(&this, &pixelsize, &viewport, &theta);
+		buffer[this.real] = sample(&point);
 	}
 }
 
