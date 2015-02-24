@@ -1,5 +1,7 @@
 CC=cc
 CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
+DEPS=circularlist.h circularlist.o loader.h loader.o mapper.h mapper.o \
+	 utils.h utils.o types.h modules/sampler.h
 
 default:	pngify resample render palette threaded threadless modules
 
@@ -15,10 +17,10 @@ render:	render.c
 palette:	palette.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-threaded:	threaded.c loader.h loader.o mapper.h mapper.o utils.h utils.o types.h modules/sampler.h
+threaded:	threaded.c $(DEPS)
 	$(CC) $(CFLAGS) $^ -o $@ -lm -lpthread -ldl
 
-threadless:	threadless.c loader.h loader.o mapper.h mapper.o utils.h utils.o types.h modules/sampler.h
+threadless:	threadless.c $(DEPS)
 	$(CC) $(CFLAGS) $^ -o $@ -lm -ldl
 
 .PHONY:	modules
