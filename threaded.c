@@ -6,46 +6,29 @@
 #include <pthread.h>	/* pthread_* */
 #include <stdbool.h>	/* bool, true, false */
 
-#define RADIUS 2.2
-
+#include "circularlist.h"
 #include "modules/sampler.h"
 #include "loader.h"
 #include "mapper.h"
 #include "types.h"
+#include "utils.h"
 
-struct line { long double *data; bool ready; bool assigned; };
+#define new(x) calloc(1, sizeof(x))
+#define line_t sample_t[max.real]
 
-struct line *buffer_start, *buffer_end, *buffer_read, *buffer_write;
-bool buffer_full = false;
-FILE *output_file;
-unsigned long long buffer_size, thread_count, *queue, next_line = 0, buffer_waiting = 0;
+typedef long double sample_t;
+
 struct pixel max;
+list output_buffer;
+unsigned long long thread_count, *queue, next_line = 0;
 
 __attribute__((hot always_inline)) static inline
 void display (void) {
-	// This takes nonzero time to draw, but it looks neat.
-	struct line *tmp = buffer_start;
-	unsigned long long lim = (buffer_size / thread_count) >> 1;
-	putchar('[');
-	for (unsigned long long i = 0; i < buffer_size; i++) {
-		if (i && 0 == (i % lim)) printf("]\n[");
-		putchar(tmp[i].ready ? '=' : tmp[i].assigned ? '|' : ' ');
-	}
-	puts("]");
-	for (unsigned long long i = 0; i < thread_count; i++)
-		printf("%llu, ", queue[i]);
-	printf(
-		"%llu/%llu (%02.02f%%)\x1b[K\x1b[%lluA\r",
-		next_line, max.imag, next_line / (float)max.imag * 100, thread_count << 1
-	);
-	/*/
-	// This is somewhat faster, but not as sweet looking.
-	printf("progress: %llu/%llu (%02.02f%% done), buffer: %llu/%llu (%02.02f%% full)\x1b[K\r",
-		next_line, max.imag, next_line / (float)max.imag * 100,
-		buffer_waiting, buffer_size, buffer_waiting / (float)buffer_size * 100
-	);
-	// */
 
+	for (unsigned long long i = 0; i < thread_count; i++)
+		printf("queue: %llu, ", queue[i]);
+	printf("progress: %llu/%llu, ", next_line, max.imag);
+	printf("buffer: %llu/%llu\r", list_used(output_buffer), list_length(output_buffer));
 	fflush(stdout);
 }
 
@@ -53,23 +36,13 @@ pthread_mutex_t write_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t data_written = PTHREAD_COND_INITIALIZER;
 FILE *output_file;
 __attribute__((hot always_inline)) static inline
-unsigned long long output (struct line **line) {
+unsigned long long output (list_buffer *line) {
 	pthread_mutex_lock(&write_lock);
 
-	(*line)->assigned = false;
-
-	buffer_waiting++;
-
-	while (buffer_read->ready) {
-		buffer_waiting--;
-		buffer_full = false;
-		buffer_read->ready = false;
-		fwrite(buffer_read->data, sizeof(long double), max.real, output_file);
-		if (++buffer_read == buffer_end) buffer_read = buffer_start;
+	while ((*line = list_read(output_buffer))) {
+		fwrite(**line, sizeof(sample_t), max.real, output_file);
 		pthread_cond_broadcast(&data_written);
 	}
-
-	while (buffer_full) pthread_cond_wait(&data_written, &write_lock);
 
 	if (next_line == max.imag) {
 		/* no work left */
@@ -77,13 +50,10 @@ unsigned long long output (struct line **line) {
 		return -1;
 	}
 
-	(*line) = buffer_write;
-	(*line)->assigned = true;
+	*line = list_get_write_ptr(output_buffer);
+	if (NULL == **line) **line = new(line_t);
 
 	display();
-
-	if (++buffer_write == buffer_end) buffer_write = buffer_start;
-	if (buffer_write == buffer_read) buffer_full = true;
 
 	/* remember to increment inside the loop, which requires returning a copy */
 	unsigned long long copy = next_line++;
@@ -94,31 +64,32 @@ unsigned long long output (struct line **line) {
 }
 
 long double complex pixelsize;
-long double complex radius;
+long double complex ratio;
 static sampler(sample);
 __attribute__((hot always_inline)) static inline
-struct line **iterate_line (
-	struct line **line, unsigned long long imag
-) {
+void iterate_line (list_buffer *line, unsigned long long imag) {
 	long double complex point;
 	struct pixel this = { .imag = imag };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
-		point = pixel2vector(&this, &pixelsize, &radius);
-		(*line)->data[this.real] = sample(&point);
+		point = pixel2vector(&this, &pixelsize, &ratio);
+		((sample_t *)**line)[this.real] = sample(&point);
 	}
-	(*line)->ready = true;
-	return line;
+
+	list_mark_ready(*line);
 }
 
+list_buffer *thread_buffers;
 static void *thread (void *ptr) {
 	unsigned long long thread = (unsigned long long)ptr;
-	struct line *line = buffer_start + thread;
+	list_buffer *line = &thread_buffers[thread];
 	queue[thread] = thread;
-	while ((unsigned long long)-1 != (
-		queue[thread] = output(iterate_line(&line, queue[thread]))
-	));
+	while ((unsigned long long)-1 != queue[thread]) {
+		iterate_line(line, queue[thread]);
+		queue[thread] = output(line);
+	}
 	queue[thread] = max.imag;
+	pthread_exit(0);
 	return NULL;
 }
 
@@ -143,49 +114,42 @@ int main (int argc, char **argv) {
 	sample = get_sampler(&argv[5]);
 
 	thread_count = atoi(argv[1]);
-	buffer_size = thread_count << 7;
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
-	radius = RADIUS + RADIUS * max.imag / max.real * I;
+	ratio = 1 + (long double)max.imag / max.real * I;
 	output_file = fopen(argv[4], "w");
 
 	/* cache some math */
-	pixelsize = calculate_pixelsize(&max, &radius);
-
-	/* allocate output buffer */
-	buffer_read = buffer_start = calloc(buffer_size, sizeof(struct line));
-	buffer_write = buffer_read + thread_count;
-	buffer_end = buffer_start + buffer_size;
-	for (unsigned long long i = 0; i < buffer_size; i++)
-		buffer_start[i].data = calloc(max.real, sizeof(long double));
+	pixelsize = calculate_pixelsize(&max, &ratio);
 
 	/* allocate process tracking space */
-	queue = calloc(thread_count, sizeof(unsigned long long));
-	pthread_t *threads = calloc(thread_count, sizeof(pthread_t));
+	queue = new(unsigned long long [thread_count]);
+	pthread_t *threads = new(pthread_t[thread_count]);
 
 	printf("spinning up %llu threads\n", thread_count);
-	for (unsigned long long i = 0; i < thread_count; i++) {
-		buffer_start[i].assigned = true;
-		queue[i] = i;
-	}
-	display();
+
+	/* allocate output buffer */
+	output_buffer = new_list(thread_count);
+	thread_buffers = new(list_buffer[thread_count]);
 
 	next_line = thread_count;
-	for (unsigned long long i = 0; i < thread_count; i++)
+	for (unsigned long long i = 0; i < thread_count; i++) {
+		thread_buffers[i] = list_get_write_ptr(output_buffer);
+		*(thread_buffers[i]) = new(line_t);
 		pthread_create(&threads[i], NULL, &thread, (void *)i);
+	}
+	display();
 
 	for (unsigned long long i = 0; i < thread_count; i++)
 		while (!pthread_join(threads[i], NULL));
 
 	display();
-	thread_count <<= 1;
-	for (unsigned long long i = 0; i <= thread_count; i++) putchar('\n');
-	puts("Done!");
+	puts("\nDone!");
 	fflush(stdout);
 
 	free(threads);
 	free(queue);
-	free(buffer_start);
+	delete_list(output_buffer);
 	fclose(output_file);
 
 	return 0;
