@@ -20,6 +20,6 @@ make palette $RENDERER render resample pngify modules || exit
 ./pngify ${OUTFILE}.rgb $SIZE_REAL $SIZE_IMAG ${OUTFILE}.png &
 ./resample ${OUTFILE}.msaa $SIZE_REAL $MSAA ${OUTFILE}.rgb &
 ./render $FLATTEN ${OUTFILE}.map palette.bin 0 $DIVIDER ${OUTFILE}.msaa &
-echo ./$RENDERER $THREADS $MSAA_REAL $MSAA_IMAG ${OUTFILE}.map $SAMPLER $SAMPLER_ARGS
-time ./$RENDERER $THREADS $MSAA_REAL $MSAA_IMAG ${OUTFILE}.map $SAMPLER $SAMPLER_ARGS
+echo ./$RENDERER $THREADS $MSAA_REAL $MSAA_IMAG ${OUTFILE}.map $SAMPLER
+time ./$RENDERER $THREADS $MSAA_REAL $MSAA_IMAG ${OUTFILE}.map $SAMPLER
 cleanup
