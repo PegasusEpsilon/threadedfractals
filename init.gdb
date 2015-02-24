@@ -1,4 +1,4 @@
-set args 1 1000 1000 -0.75 0 1.35 1.35 0
+set args 1 192 108 test.map translate -0.75 0 mandelbrot renormalized escape_count 16
 break main
 run
 skip file atoi.c
