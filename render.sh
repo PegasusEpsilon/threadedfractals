@@ -10,19 +10,17 @@
 MSAA_REAL=$(($SIZE_REAL*$MSAA))
 MSAA_IMAG=$(($SIZE_IMAG*$MSAA))
 
-#cleanup () { rm ${OUTFILE}.map ${OUTFILE}.msaa ${OUTFILE}.rgb; }
-#cleanup
-#mkfifo ${OUTFILE}.rgb ${OUTFILE}.msaa ${OUTFILE}.map
-#trap "cleanup; exit" 1 2 3 4 5 6 7 8 11 13 14 15
+cleanup () { rm ${OUTFILE}.map ${OUTFILE}.msaa ${OUTFILE}.rgb; }
+cleanup
+mkfifo ${OUTFILE}.rgb ${OUTFILE}.msaa ${OUTFILE}.map
+trap "cleanup; exit" 1 2 3 4 5 6 7 8 11 13 14 15
 
 set -x
 make palette $RENDERER render resample pngify modules || exit
 ./palette palettes/$PALETTE palette.bin
-#./pngify ${OUTFILE}.rgb $SIZE_REAL $SIZE_IMAG ${OUTFILE}.png &
-#./resample ${OUTFILE}.msaa $SIZE_REAL $MSAA ${OUTFILE}.rgb &
-#./render $FLATTEN ${OUTFILE}.map palette.bin 0 $DIVIDER ${OUTFILE}.msaa &
+./pngify ${OUTFILE}.rgb $SIZE_REAL $SIZE_IMAG ${OUTFILE}.png &
+./resample ${OUTFILE}.msaa $SIZE_REAL $MSAA ${OUTFILE}.rgb &
+./render $FLATTEN ${OUTFILE}.map palette.bin 0 $DIVIDER ${OUTFILE}.msaa &
 time ./$RENDERER $THREADS $MSAA_REAL $MSAA_IMAG ${OUTFILE}.map $SAMPLER
-./render $FLATTEN ${OUTFILE}.map palette.bin 0 $DIVIDER ${OUTFILE}.msaa
-./resample ${OUTFILE}.msaa $SIZE_REAL $MSAA ${OUTFILE}.rgb
-./pngify ${OUTFILE}.rgb $SIZE_REAL $SIZE_IMAG ${OUTFILE}.png
-#cleanup
+set +x
+cleanup
