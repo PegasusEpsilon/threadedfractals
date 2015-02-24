@@ -5,8 +5,6 @@
 #include <stdarg.h> 	/* va_list, va_start(), va_end() */
 #include <stdbool.h>	/* bool, true, false */
 
-#define RADIUS 2.2
-
 #include "modules/sampler.h"
 #include "loader.h"
 #include "mapper.h"
@@ -35,7 +33,7 @@ void output (void) {
 }
 
 long double complex pixelsize;
-long double complex radius;
+long double complex ratio;
 static sampler(sample);
 __attribute__((hot always_inline)) static inline
 void iterate_line () {
@@ -43,7 +41,7 @@ void iterate_line () {
 	struct pixel this = { .imag = next_line };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
-		point = pixel2vector(&this, &pixelsize, &radius);
+		point = pixel2vector(&this, &pixelsize, &ratio);
 		buffer[this.real] = sample(&point);
 	}
 }
@@ -76,11 +74,11 @@ int main (int argc, char **argv) {
 
 	max.real = atoi(argv[1]);
 	max.imag = atoi(argv[2]);
-	radius = RADIUS + RADIUS * max.imag / max.real * I;
+	ratio = 1 + (long double)max.imag / max.real * I;
 	output_file = fopen(argv[3], "w");
 
 	/* cache some math */
-	pixelsize = calculate_pixelsize(&max, &radius);
+	pixelsize = calculate_pixelsize(&max, &ratio);
 
 	/* allocate output buffer */
 	buffer = calloc(max.real, sizeof(long double));
