@@ -24,11 +24,14 @@ unsigned long long thread_count, *queue, next_line = 0;
 
 __attribute__((hot always_inline)) static inline
 void display (void) {
-
+	printf("queue: ");
 	for (unsigned long long i = 0; i < thread_count; i++)
-		printf("queue: %llu, ", queue[i]);
-	printf("progress: %llu/%llu, ", next_line, max.imag);
-	printf("buffer: %llu/%llu\r", list_used(output_buffer), list_length(output_buffer));
+		printf("%llu, ", queue[i]);
+	printf("progress: %llu/%llu (%0.2f%%), ", next_line, max.imag,
+		100 * (float)next_line / max.imag);
+	unsigned long long used = list_used(output_buffer);
+	unsigned long long length = list_length(output_buffer);
+	printf("buffer: %llu/%llu (%0.2f%%)\x1b[K\r", used, length, 100 * (float)used / length);
 	fflush(stdout);
 }
 
