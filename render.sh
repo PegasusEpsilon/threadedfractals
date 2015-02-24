@@ -15,8 +15,8 @@ cleanup
 mkfifo ${OUTFILE}.rgb ${OUTFILE}.msaa ${OUTFILE}.map
 trap "cleanup; exit" 1 2 3 4 5 6 7 8 11 13 14 15
 
-make palette $RENDERER modules render resample pngify || exit
-./palette $PALETTE palette.bin
+make palette $RENDERER render resample pngify modules || exit
+./palette palettes/$PALETTE palette.bin
 ./pngify ${OUTFILE}.rgb $SIZE_REAL $SIZE_IMAG ${OUTFILE}.png &
 ./resample ${OUTFILE}.msaa $SIZE_REAL $MSAA ${OUTFILE}.rgb &
 ./render $FLATTEN ${OUTFILE}.map palette.bin 0 $DIVIDER ${OUTFILE}.msaa &

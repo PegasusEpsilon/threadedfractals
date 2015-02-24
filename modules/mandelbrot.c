@@ -1,10 +1,6 @@
 #include <stdio.h>	/* printf() puts() */
 #include <stdlib.h>	/* exit() */
 
-#include "types.h"
-#include "loader.h"
-#include "complex_sampler.h"
-
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
 	printf("Usage: ... %s SAMPLER ARGS\n", myself);
@@ -12,6 +8,11 @@ void usage (char *myself) {
 	puts("	ARGS	any extra arguments required by the complex sampler");
 	exit(1);
 }
+
+#include "loader.h"         	/* get_sampler() */
+#include "complex_sampler.h"	/* sampler() */
+
+static sampler(complex_sample);
 
 __attribute__((cold))
 void init (char **argv) {

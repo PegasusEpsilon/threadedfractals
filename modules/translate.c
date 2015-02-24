@@ -1,10 +1,5 @@
 #include <stdio.h>  	/* printf(), puts() */
 #include <stdlib.h> 	/* exit() */
-#include <math.h>   	/* sin(), cos() */
-#include <complex.h>	/* complex */
-
-#include "constants.h"	/* M_PI */
-#include "loader.h" 	/* get_sampler() */
 
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
@@ -14,8 +9,14 @@ void usage (char *myself) {
 	exit(1);
 }
 
+#include <math.h>   	/* sin(), cos() */
+#include <complex.h>	/* complex */
+
+#include "loader.h" 	/* get_sampler() */
+#include "sampler.h"	/* sampler() */
+
 static long double complex center;
-static long double (*real_sample) (long double complex *);
+static sampler(real_sample);
 
 __attribute__((cold))
 void init (char **argv) {
@@ -29,7 +30,7 @@ void init (char **argv) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
 	/* load the sampler we've been asked to pass to */
-	real_sample = (long double (*) (long double complex *))get_sampler(&argv[3]);
+	real_sample = (sampler())get_sampler(&argv[3]);
 #pragma GCC diagnostic pop
 }
 

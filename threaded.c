@@ -6,9 +6,11 @@
 #include <pthread.h>	/* pthread_* */
 #include <stdbool.h>	/* bool, true, false */
 
+#define RADIUS 2.2
+
+#include "modules/sampler.h"
 #include "loader.h"
 #include "mapper.h"
-#include "sample.h"
 #include "types.h"
 
 struct line { long double *data; bool ready; bool assigned; };
@@ -92,7 +94,8 @@ unsigned long long output (struct line **line) {
 }
 
 long double complex pixelsize;
-long double complex radius; /* FIXME: i do not need to exist anymore */
+long double complex radius;
+static sampler(sample);
 __attribute__((hot always_inline)) static inline
 struct line **iterate_line (
 	struct line **line, unsigned long long imag
@@ -143,7 +146,7 @@ int main (int argc, char **argv) {
 	buffer_size = thread_count << 7;
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
-	radius = 2 + 2 * max.imag / max.real * I;
+	radius = RADIUS + RADIUS * max.imag / max.real * I;
 	output_file = fopen(argv[4], "w");
 
 	/* cache some math */

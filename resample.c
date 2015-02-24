@@ -1,11 +1,3 @@
-/* resample.c/v0.1 - generic resampler for complexfractals
- * by Pegasus Epsilon <pegasus@pimpninjas.org>
- * Distribute Unmodified -- http://pegasus.pimpninjas.org/license
- *
- *  Changelog:
- *  0.1 -- First version.
- */
-
 #include <inttypes.h>	/* uint8_t, uint32_t */
 #include <stdio.h>   	/* printf() */
 #include <stdlib.h>  	/* exit() */

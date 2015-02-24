@@ -16,6 +16,7 @@ void usage (char *myself) {
 }
 
 static long double complex mandelbrot_coords;
+static sampler(complex_sample);
 
 __attribute__((cold))
 void init (char **argv) {

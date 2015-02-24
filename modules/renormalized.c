@@ -1,10 +1,5 @@
 #include <stdio.h>  	/* printf(), puts() */
 #include <stdlib.h> 	/* exit() */
-#include <complex.h>	/* complex, cabsl() */
-#include <math.h>   	/* log2l(), logl() */
-
-#include "loader.h"
-#include "complex_sampler.h"
 
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
@@ -13,6 +8,14 @@ void usage (char *myself) {
 	puts("	ARGS	any arguments needed by SAMPLER");
 	exit(1);
 }
+
+#include <complex.h>	/* complex, cabsl() */
+#include <math.h>   	/* log2l(), logl() */
+
+#include "loader.h"
+#include "complex_sampler.h"
+
+static sampler(complex_sample);
 
 __attribute__((cold))
 void init (char **argv) {
