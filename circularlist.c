@@ -29,7 +29,13 @@ unsigned long long list_length (struct list *restrict const this) {
 
 struct node *new_node (void) {
 	struct node *new = new(struct node);
-	(*new) = (struct node){ 0 };
+	(*new) = (struct node){
+		.data = NULL,
+		.next = NULL,
+		.previous = NULL,
+		.busy = false,
+		.ready = false
+	};
 	return new;
 }
 
