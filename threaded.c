@@ -89,7 +89,6 @@ list_buffer *thread_buffers;
 static void *thread (void *ptr) {
 	unsigned long long thread = (unsigned long long)ptr;
 	list_buffer *line = &thread_buffers[thread];
-	queue[thread] = thread;
 	while ((unsigned long long)-1 != queue[thread]) {
 		iterate_line(line, queue[thread]);
 		queue[thread] = output(line);
@@ -143,6 +142,7 @@ int main (int argc, char **argv) {
 	for (unsigned long long i = 0; i < thread_count; i++) {
 		thread_buffers[i] = list_get_write_ptr(output_buffer);
 		*(thread_buffers[i]) = new(line_t);
+		queue[i] = i;
 		pthread_create(&threads[i], NULL, &thread, (void *)i);
 	}
 	display();
