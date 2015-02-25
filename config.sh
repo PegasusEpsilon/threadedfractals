@@ -23,5 +23,5 @@ RADIUS_REAL=0.00016
 SAMPLER="scale $RADIUS_REAL translate $CENTER_REAL $CENTER_IMAG mandelbrot renormalized escape_count 16"
 DIVIDER=1
 FLATTEN=-l
-PALETTE=blueglow.txt
+PALETTE=palette
 RENDERER=threaded

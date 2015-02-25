@@ -3,8 +3,10 @@
 source config.sh
 
 # julia rejiggery
-SAMPLER="scale 2 julia -0.7766729 -0.13661091 crosstrap 0.125 1 0"
+SAMPLER="scale $RADIUS_REAL julia $CENTER_REAL $CENTER_IMAG crosstrap 0.125 1 0"
+PALETTE=blueglow
 DIVIDER=.375
+SHIFT=0
 OUTFILE=julia
 FLATTEN=
 
