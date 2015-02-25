@@ -24,14 +24,17 @@ unsigned long long thread_count, *queue, next_line = 0;
 
 __attribute__((hot always_inline)) static inline
 void display (void) {
-	printf("queue: ");
+	/* queue */
+	printf("Q: ");
 	for (unsigned long long i = 0; i < thread_count; i++)
 		printf("%llu, ", queue[i]);
-	printf("progress: %llu/%llu (%0.2f%%), ", next_line, max.imag,
+	/* progress */
+	printf("P: %llu/%llu (%0.2f%%), ", next_line, max.imag,
 		100 * (float)next_line / max.imag);
+	/* buffer */
 	unsigned long long used = list_used(output_buffer);
 	unsigned long long length = list_length(output_buffer);
-	printf("buffer: %llu/%llu (%0.2f%%)\x1b[K\r", used, length, 100 * (float)used / length);
+	printf("B: %llu/%llu (%0.2f%%)\x1b[K\r", used, length, 100 * (float)used / length);
 	fflush(stdout);
 }
 
@@ -119,7 +122,8 @@ int main (int argc, char **argv) {
 	thread_count = atoi(argv[1]);
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
-	ratio = 1 + (long double)max.imag / max.real * I;
+	/* reverse vertical axis so positive = up */
+	ratio = 1 - (long double)max.imag / max.real * I;
 	output_file = fopen(argv[4], "w");
 
 	/* cache some math */
