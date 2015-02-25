@@ -25,7 +25,7 @@ void init (char **argv) {
 	if (3 > argc) usage(argv[0]);
 	/* convert degrees to rotation matrix and store for later */
 	theta = strtold(argv[1], NULL) * M_PI / 180;
-	theta = cosl(theta) - sinl(theta) * I;
+	theta = cosl(theta) + sinl(theta) * I;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
 	real_sample = (sampler())get_sampler(&argv[2]);
