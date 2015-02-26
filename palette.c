@@ -1,14 +1,3 @@
-/* palette.c/v4.2 - palette generator for complexfractals
- * by Pegasus Epsilon <pegasus@pimpninjas.org>
- * Distribute Unmodified - http://pegasus.pimpninjas.org/license
- *
- *  Changelog:
- *  v4.0 - Decoupled channels
- *  v4.1 - Added verbose flag, suppressed noisy debug info
- *  v4.2 - Rewrote some, added comments, verified that the RGB directive works
- *  v4.3 - Cleanup
- */
-
 #include <stdio.h>      	/* perror(), puts(), printf(), fopen(), fgets(), feof(), sscanf(), fclose(), fwrite() */
 #include <stdlib.h>     	/* exit(), realloc(), calloc(), free(), size_t */
 #include <stdarg.h>     	/* va_list, va_start(), vprintf(), va_end() */
@@ -109,7 +98,7 @@ struct gradient *generate_palette (const struct channel *channels, struct gradie
 
 __attribute__((noreturn))
 void usage (const char *myself) {
-	printf("Usage: %s infile outfile\n\n", myself);
+	printf("Usage: %s [-v] infile outfile\n\n", myself);
 	puts("\t-v\tshow debug output");
 	exit(1);
 }
