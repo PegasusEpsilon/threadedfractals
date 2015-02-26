@@ -1,12 +1,15 @@
 #define _GNU_SOURCE 	/* asprintf() */
-
+#include <stdio.h>  	/* asprintf() */
 #include <stdlib.h> 	/* atexit() */
 #include <dlfcn.h>  	/* dlopen(), dlsym(), dlclose() */
 
 #include "types.h"
 #include "utils.h"
 
-void *sampler_handle = NULL;
+// each module has its own copy of this compilation unit, so this variable is
+// not shared between any of them, despite it only being created once in the
+// codebase
+static void *sampler_handle = NULL;
 __attribute__((cold)) static
 void dispose_sampler (void) { dlclose(sampler_handle); }
 
@@ -22,12 +25,13 @@ long double (*get_sampler (char **argv))(long double complex *) {
 	if (-1 == asprintf(&tmp, "modules/%s.so", argv[0]))
 		die("asprintf() threw an error. Giving up.");
 	if (!(sampler_handle = dlopen(argv[0], RTLD_LAZY))) {
+		free(tmp);
 		if (-1 == asprintf(&tmp, "./modules/%s.so", argv[0]))
 			die("asprintf() threw an error. Giving up.");
 		sampler_handle = dlopen(tmp, RTLD_LAZY);
-		free(tmp);
 		if (!sampler_handle) die(dlerror());
 	}
+	free(tmp);
 
 	/* clean up when we exit */
 	atexit(dispose_sampler);
