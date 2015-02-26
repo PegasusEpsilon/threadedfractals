@@ -94,7 +94,6 @@ static void *thread (void *ptr) {
 		queue[thread] = output(line);
 	}
 	queue[thread] = max.imag;
-	pthread_exit(0);
 	return NULL;
 }
 
@@ -156,6 +155,7 @@ int main (int argc, char **argv) {
 
 	free(threads);
 	free(queue);
+	free(thread_buffers);
 	delete_list(output_buffer);
 	fclose(output_file);
 
