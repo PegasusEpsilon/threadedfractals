@@ -9,7 +9,6 @@
 
 source config.sh
 
-PALETTE=palette.txt
 OUTFILE=threaded
 
 source render.sh

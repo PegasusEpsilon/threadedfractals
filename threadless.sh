@@ -2,7 +2,7 @@
 
 source config.sh
 
-PALETTE=palette.txt
+PALETTE=palette
 RENDERER=threadless
 OUTFILE=$RENDERER
 unset THREADS
