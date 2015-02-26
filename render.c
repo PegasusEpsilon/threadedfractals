@@ -1,16 +1,3 @@
-/* render.c/v3.0a3 - final RGB renderer for complexfractals.
- * by Pegasus Epsilon <pegasus@pimpninjas.org>
- * Distribute Unmodified -- http://pegasus.pimpninjas.org/license
- *
- *  CHANGELOG:
- *  3.0a1 -- first version with a separated sampler/renderer.
- *  3.0a2 -- fixed bug where "in-set" indicator was ignored.
- *  3.0a3 -- added logarithm command line options.
- *
- *  TODO:
- *  -- Add a way to specify the color for samples that are in-set.
- */
-
 #define _POSIX_SOURCE 	/* fileno() */
 #include <stdio.h>    	/* printf(), puts(), FILE, fopen(), fwrite(), fclose(), fileno() */
 #include <stdlib.h>   	/* exit(), atoi(), atof() */
@@ -22,11 +9,15 @@
 #include <math.h>     	/* log() */
 #include <string.h>   	/* strcmp() */
 
+#define BUFSIZE 4096 / sizeof(long double)
+
+typedef struct { char r, g, b; } rgb24;
+
 typedef struct {
 	size_t size;
 	int fd, shift;
 	long double divider;
-	char *map;
+	rgb24 *map;
 } palette;
 
 __attribute__((noreturn))
@@ -69,25 +60,31 @@ int main (int argc, char **argv) {
 		map.size = (size_t)info.st_size;
 	}
 	map.map = mmap(NULL, map.size, PROT_READ, MAP_SHARED, map.fd, (size_t)0);
+	map.size /= 3;
 	map.shift = atoi(argv[3]);
 	map.divider = strtold(argv[4], NULL);
 	outfile = fopen(argv[5], "w");
 
-	for (;;) { /* ever */
-		static long double sample;
-		const unsigned char black[] = { 0, 0, 0 };
-		if (1 != fread(&sample, sizeof(long double), (size_t)1, infile)) {
-			if (feof(infile)) break; /* clean EOF, all done */
-			else fail(argv[1]); /* shit broke, throw a fit */
-		} /* got data, do work */
-		if (0 <= sample) {
-			fwrite(map.map + 3 * (unsigned long long)(
-				map.size + fabsl(flatten(sample)) *
+	size_t records;
+	do {
+		long double inbuffer[BUFSIZE];
+		rgb24 outbuffer[BUFSIZE];
+		rgb24 black = { 0, 0, 0 };
+
+		records = fread(inbuffer, sizeof(long double), BUFSIZE, infile);
+
+		// if short read, and not EOF infile, shit broke, throw a fit.
+		if (BUFSIZE != records && !feof(infile)) fail(argv[1]);
+
+		// convert samples to rgb24 colors
+		for (size_t i = 0; i < records; i++)
+			outbuffer[i] = inbuffer[i] < 0 ? black : map.map[(size_t)(
+				map.size + fabsl(flatten(inbuffer[i])) *
 				map.size / map.divider + map.shift
-			) % map.size, (size_t)1, (size_t)3, outfile);
-		} else
-			fwrite(black, (size_t)1, (size_t)3, outfile);
-	}
+			) % map.size];
+
+		fwrite(outbuffer, sizeof(rgb24), records, outfile);
+	} while (BUFSIZE == records);
 	fclose(infile);
 	close(map.fd);
 	fclose(outfile);
