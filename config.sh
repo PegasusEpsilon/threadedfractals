@@ -21,7 +21,7 @@ RADIUS_REAL=0.00016
 #RADIUS_REAL=0.000000000002
 
 SAMPLER="scale $RADIUS_REAL translate $CENTER_REAL $CENTER_IMAG mandelbrot renormalized escape_count 16"
-DIVIDER=1
+DIVIDER=.3
 FLATTEN=-l
 PALETTE=palette
 RENDERER=threaded
