@@ -28,6 +28,10 @@ long double (*get_sampler (char **argv))(long double complex *) {
 		free(tmp);
 		if (-1 == asprintf(&tmp, "./modules/%s.so", argv[0]))
 			die("asprintf() threw an error. Giving up.");
+		/* valgrind/memcheck reports a leak of memory allocated by dlopen().
+		 * there is no way to force libdl to release this memory.
+		 * it's not a bug in this code.
+		 */
 		sampler_handle = dlopen(tmp, RTLD_LAZY);
 		if (!sampler_handle) die(dlerror());
 	}

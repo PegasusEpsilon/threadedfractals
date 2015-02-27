@@ -159,10 +159,5 @@ int main (int argc, char **argv) {
 	delete_list(output_buffer);
 	fclose(output_file);
 
-/* at this point, valgrind/memcheck reports a leak of memory allocated by
- * dlopen(). there is no way to force libdl to release this memory. so it's
- * not a bug in our code.
- */
-
 	return 0;
 }
