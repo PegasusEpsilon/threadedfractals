@@ -26,7 +26,7 @@ void init (char **argv) {
 	if (4 > argc) usage(argv[0]);
 	long double tmp1 = strtold(argv[1], NULL);
 	long double tmp2 = strtold(argv[2], NULL);
-	center = tmp1 + tmp2 * I;
+	center = tmp1 - tmp2 * I;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
 	/* load the sampler we've been asked to pass to */
