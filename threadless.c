@@ -56,7 +56,7 @@ void thread (void) {
 
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
-	puts("Unthreaded Mandelbrot sampler\n");
+	puts("Unthreaded fractal sampler\n");
 	printf("Usage: %s WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	WIDTH	number of horizontal samples");
 	puts("	HEIGHT	number of vertical samples");

@@ -99,7 +99,7 @@ static void *thread (void *ptr) {
 
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
-	puts("Threaded Mandelbrot sampler\n");
+	puts("Threaded fractal sampler\n");
 	printf("Usage: %s THREADS WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	THREADS	how many threads to spawn");
 	puts("	WIDTH	number of horizontal samples");
@@ -142,12 +142,12 @@ int main (int argc, char **argv) {
 		thread_buffers[i] = list_get_write_ptr(output_buffer);
 		*(thread_buffers[i]) = new(line_t);
 		queue[i] = i;
-		pthread_create(&threads[i], NULL, &thread, (void *)i);
+		pthread_create(&threads[i], NULL, thread, (void *)i);
 	}
 	display();
 
 	for (unsigned long long i = 0; i < thread_count; i++)
-		while (!pthread_join(threads[i], NULL));
+		while (pthread_join(threads[i], NULL));
 
 	display();
 	puts("\nDone!");
