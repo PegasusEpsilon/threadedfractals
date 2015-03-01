@@ -1,5 +1,5 @@
 CC=cc
-CFLAGS=-g -Ofast -I.. -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
+CFLAGS=-Ofast -I.. -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 DEPS=../loader.c ../utils.c
 
 modules:
