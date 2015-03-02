@@ -1,5 +1,5 @@
 CC=cc
-CFLAGS=-Ofast -Wall -Wextra -Werror -ansi -pedantic -std=c99 -fmax-errors=3
+CFLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 DEPS=circularlist.h circularlist.o loader.h loader.o mapper.h mapper.o \
 	 utils.h utils.o types.h modules/sampler.h
 

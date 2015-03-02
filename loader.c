@@ -46,7 +46,7 @@ long double (*get_sampler (char **argv))(long double complex *) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
 	if (!(fn = (long double (*)(long double complex *))dlsym(sampler_handle, "sample"))) {
-		char *tmp = dlerror();
+		tmp = dlerror();
 		die(tmp ? tmp : "NULL sampler not allowed");
 	}
 
