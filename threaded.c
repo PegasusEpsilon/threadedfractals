@@ -87,13 +87,13 @@ void iterate_line (list_buffer *line, unsigned long long imag) {
 
 list_buffer *thread_buffers;
 static void *thread (void *ptr) {
-	unsigned long long thread = (unsigned long long)ptr;
-	list_buffer *line = &thread_buffers[thread];
-	while ((unsigned long long)-1 != queue[thread]) {
-		iterate_line(line, queue[thread]);
-		queue[thread] = output(line);
+	unsigned long long i = (unsigned long long)ptr;
+	list_buffer *line = &thread_buffers[i];
+	while ((unsigned long long)-1 != queue[i]) {
+		iterate_line(line, queue[i]);
+		queue[i] = output(line);
 	}
-	queue[thread] = max.imag;
+	queue[i] = max.imag;
 	return NULL;
 }
 
