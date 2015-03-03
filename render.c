@@ -7,7 +7,9 @@
 #include <fcntl.h>    	/* open(), close() */
 #include <unistd.h>   	/* fstat() */
 #include <math.h>     	/* log() */
-#include <string.h>   	/* strcmp() */
+#include <stdint.h>   	/* uint16_t */
+
+#include "utils.h"
 
 #define BUFSIZE 4096 / sizeof(long double)
 
@@ -27,17 +29,13 @@ void usage(const char *myself) {
 	puts("\t\t(flatten more)");
 	puts("\t-2\tapply the base-2 logarithm to each sample before mapping");
 	puts("\t\t(flatten less)");
-	puts("\t\tOnly one logarithm may be applied at a time (for now)");
-	exit(1);
-}
-
-__attribute__((noreturn))
-void fail (const char *msg) {   /* report function failures */
-	perror(msg);
+	puts("\t-x\tapply the natural logarithm TWICE to each sample before mapping");
+	puts("\t\t(flatten most)");
 	exit(1);
 }
 
 long double nothing (long double x) { return x; }
+long double doublelog (long double x) { return logl(logl(x)); }
 
 int main (int argc, char **argv) {
 	FILE *infile, *outfile;
@@ -45,8 +43,9 @@ int main (int argc, char **argv) {
 	long double (*flatten)(long double) = &nothing;
 
 	if (1 < argc) {
-		if (!strcmp("-l", argv[1])) flatten = &logl;
-		if (!strcmp("-2", argv[1])) flatten = &log2l;
+		if (*(uint16_t *)"-l" == *(uint16_t *)argv[1]) flatten = logl;
+		if (*(uint16_t *)"-2" == *(uint16_t *)argv[1]) flatten = log2l;
+		if (*(uint16_t *)"-x" == *(uint16_t *)argv[1]) flatten = doublelog;
 		if (flatten != &nothing) { argc--; argv++; }
 	}
 

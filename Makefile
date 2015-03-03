@@ -11,7 +11,7 @@ pngify:	pngify.c utils.o
 resample:	resample.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-render:	render.c
+render:	render.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 palette:	palette.c utils.o
