@@ -1,33 +1,18 @@
 #include <complex.h>	/* complex, cabsl() */
 #include <stdbool.h>	/* bool */
 #include <math.h>   	/* sinl(), cosl(), cabsl() */
-#include <stdio.h>
 
 #include "types.h"
 #include "constants.h"
 
-static long double complex F1_theta;
-static long double complex F2_theta;
-
 __attribute__((cold))
-void init (const char *restrict const *restrict const argv) {
-	(void)argv;
-#	define F1_deg (135 * M_PI / 180)
-#	define F2_deg (45 * M_PI / 180)
-	F1_theta = cosl(F1_deg) + sinl(F1_deg) * I;
-	F2_theta = cosl(F2_deg) + sinl(F2_deg) * I;
-}
+void init (const char *restrict const *restrict const argv) { (void)argv; }
 
-__attribute__((hot always_inline)) static inline
-long double complex zoom (long double complex z) {
-	return creall(z) * sqrt(2) + cimagl(z) * sqrt(2) * I;
-}
+__attribute__((pure hot)) static
+long double complex F1 (long double complex z) { return z * (1 + I); }
 
-__attribute__((hot)) static
-long double complex F1 (long double complex z) { return zoom((z + 2) * F1_theta); }
-
-__attribute__((hot)) static
-long double complex F2 (long double complex z) { return zoom(z * F2_theta); }
+__attribute__((pure hot)) static
+long double complex F2 (long double complex z) { return (2 + z) * (-1 + I); }
 
 __attribute__((hot always_inline)) static inline
 long double recurse (
