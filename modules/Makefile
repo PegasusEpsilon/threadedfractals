@@ -4,7 +4,7 @@ DEPS=../loader.c ../utils.c
 
 modules:
 	make julia.so mandelbrot.so crosstrap.so pointtrap.so renormalized.so \
-	escape_count.so rotate.so translate.so scale.so dragon.so
+	escape_count.so rotate.so translate.so scale.so dragon.so levy.so
 
 %.so: %.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
@@ -30,10 +30,13 @@ julia.so:	julia.c $(DEPS)
 dragon.so:	dragon.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -lm -o $@
 
+levy.so:	levy.c
+	$(CC) $(CFLAGS) -fPIC -shared $^ -lm -o $@
+
 clean:
 	for spec in \
 		renormalized.so pointtrap.so crosstrap.so \
 		mandelbrot.so julia.so escape_count.so \
-		rotate.so translate.so scale.so dragon.so \
+		rotate.so translate.so scale.so dragon.so levy.so\
 	; do test -e $$spec && rm $$spec \
 	; done || true
