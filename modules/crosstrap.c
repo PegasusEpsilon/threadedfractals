@@ -5,7 +5,7 @@ __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
 	printf("Usage: ... %s RANGE START ANGLE\n", myself);
 	puts("	RANGE	range within which a trap takes effect");
-	puts("		Note: larger ranges make bigger points");
+	puts("		Note: larger ranges make thicker lines");
 	puts("	START	iteration on which to start trapping");
 	puts("		Note: higher values remove more foreground lines");
 	puts("	ANGLE	angle of the cross, 0-90");

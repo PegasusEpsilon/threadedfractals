@@ -7,7 +7,7 @@ void usage (char *myself) {
 	puts("	RANGE	range within which a trap takes effect");
 	puts("		Note: larger ranges make bigger points");
 	puts("	START	iteration on which to start trapping");
-	puts("		Note: higher values remove more foreground lines");
+	puts("		Note: higher values remove more foreground points");
 	exit(1);
 }
 
