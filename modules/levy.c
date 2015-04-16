@@ -1,55 +1,56 @@
-#include <complex.h>	/* complex, cabsl() */
+#include <complex.h>	/* complex, cabs*() */
 #include <stdbool.h>	/* bool */
-#include <math.h>   	/* sinl(), cosl(), cabsl() */
+#include <math.h>   	/* sqrt*() */
 
-#include "types.h"
 #include "constants.h"
+#include "types.h"
+#include "config.h"
 
 __attribute__((cold))
 void init (const char *restrict const *restrict const argv) { (void)argv; }
 
 __attribute__((pure hot)) static
-long double complex F1 (long double complex z) { return z * (1 + I); }
+complex FLOAT F1 (complex FLOAT z) { return z * (1 + I); }
 
 __attribute__((pure hot)) static
-long double complex F2 (long double complex z) { return (2 + z) * (1 - I); }
+complex FLOAT F2 (complex FLOAT z) { return (2 + z) * (1 - I); }
 
 __attribute__((hot always_inline)) static inline
-long double recurse (
-	long double complex (*) (long double complex),
-	long double complex (*) (long double complex),
-	long double complex, long double
+FLOAT recurse (
+	complex FLOAT (*) (complex FLOAT),
+	complex FLOAT (*) (complex FLOAT),
+	complex FLOAT, FLOAT
 );
 
 __attribute__((hot)) static
-long double mutate (
-	long double complex (*f1) (long double complex),
-	long double complex (*f2) (long double complex),
-	long double complex z, long double trap
+FLOAT mutate (
+	complex FLOAT (*f1) (complex FLOAT),
+	complex FLOAT (*f2) (complex FLOAT),
+	complex FLOAT z, FLOAT trap
 ) {
 	z = f1(z);
-	trap *= sqrt(2);
+	trap *= SQRT(2);
 
-	if (fabsl(creall(z)) < trap && fabsl(cimagl(z)) < trap) return -1;
-	if (cabsl(z) > 8) return 1;
+	if (FABS(CREAL(z)) < trap && FABS(CIMAG(z)) < trap) return -1;
+	if (CABS(z) > 8) return 1;
 
 	return recurse(f1, f2, z, trap);
 }
 
 __attribute__((hot always_inline)) static inline
-long double recurse (
-	long double complex (*f1) (long double complex),
-	long double complex (*f2) (long double complex),
-	long double complex z, long double trap
+FLOAT recurse (
+	complex FLOAT (*f1) (complex FLOAT),
+	complex FLOAT (*f2) (complex FLOAT),
+	complex FLOAT z, FLOAT trap
 ) {
-	long double one = mutate(f1, f2, z, trap);
+	FLOAT one = mutate(f1, f2, z, trap);
 	if (0 > one) return one;
-	long double two = mutate(f2, f1, z, trap);
+	FLOAT two = mutate(f2, f1, z, trap);
 	if (0 > two) return two;
 	return one + two;
 }
 
 __attribute__((hot))
-long double sample (long double complex *const z) {
-	return recurse(F1, F2, *z, (long double)1/4000);
+FLOAT sample (complex FLOAT *const z) {
+	return recurse(F1, F2, *z, (FLOAT)1/4000);
 }

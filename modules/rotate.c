@@ -8,14 +8,14 @@ void usage (char *myself) {
 	exit(1);
 }
 
-#include <math.h>   	/* sin(), cos() */
-#include <complex.h>	/* creall(), cimagl() */
+#include <math.h>   	/* sin*(), cos*() */
 
 #include "constants.h"	/* M_PI */
 #include "sampler.h"	/* sampler() */
 #include "loader.h" 	/* get_sampler() */
+#include "config.h"
 
-static long double complex theta = 0;
+static complex FLOAT theta = 0;
 static sampler(real_sample);
 
 __attribute__((cold))
@@ -25,7 +25,7 @@ void init (char **argv) {
 	if (3 > argc) usage(argv[0]);
 	/* convert degrees to rotation matrix and store for later */
 	theta = strtold(argv[1], NULL) * M_PI / 180;
-	theta = cosl(theta) + sinl(theta) * I;
+	theta = COS(theta) + SIN(theta) * I;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
 	real_sample = (sampler())get_sampler(&argv[2]);
@@ -33,7 +33,7 @@ void init (char **argv) {
 }
 
 __attribute__((pure hot))
-long double sample (long double complex *point) {
+FLOAT sample (complex FLOAT *point) {
 	*point *= theta;
 	return real_sample(point);
 }

@@ -27,7 +27,7 @@ void init (char **argv) {
 }
 
 __attribute__((pure hot))
-long double sample (long double complex *const point) {
-	long double complex zero = 0 + 0 * I;
+FLOAT sample (complex FLOAT *const point) {
+	complex FLOAT zero = 0 + 0 * I;
 	return complex_sample(&zero, point);
 }

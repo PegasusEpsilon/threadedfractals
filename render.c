@@ -10,15 +10,17 @@
 #include <stdint.h>   	/* uint16_t */
 
 #include "utils.h"
+#include "types.h"
+#include "config.h"
 
-#define BUFSIZE 4096 / sizeof(long double)
+#define BUFSIZE 4096 / sizeof(FLOAT)
 
 typedef struct { char r, g, b; } rgb24;
 
 typedef struct {
 	size_t size;
 	int fd, shift;
-	long double divider;
+	FLOAT divider;
 	rgb24 *map;
 } palette;
 
@@ -34,17 +36,17 @@ void usage(const char *myself) {
 	exit(1);
 }
 
-long double nothing (long double x) { return x; }
-long double doublelog (long double x) { return logl(logl(x)); }
+FLOAT nothing (FLOAT x) { return x; }
+FLOAT doublelog (FLOAT x) { return LOG(LOG(x)); }
 
 int main (int argc, char **argv) {
 	FILE *infile, *outfile;
 	palette map;
-	long double (*flatten)(long double) = &nothing;
+	FLOAT (*flatten)(FLOAT) = &nothing;
 
 	if (1 < argc) {
-		if (*(uint16_t *)"-l" == *(uint16_t *)argv[1]) flatten = logl;
-		if (*(uint16_t *)"-2" == *(uint16_t *)argv[1]) flatten = log2l;
+		if (*(uint16_t *)"-l" == *(uint16_t *)argv[1]) flatten = LOG;
+		if (*(uint16_t *)"-2" == *(uint16_t *)argv[1]) flatten = LOG2;
 		if (*(uint16_t *)"-x" == *(uint16_t *)argv[1]) flatten = doublelog;
 		if (flatten != &nothing) { argc--; argv++; }
 	}
@@ -66,11 +68,11 @@ int main (int argc, char **argv) {
 
 	size_t records;
 	do {
-		long double inbuffer[BUFSIZE];
+		FLOAT inbuffer[BUFSIZE];
 		rgb24 outbuffer[BUFSIZE];
 		rgb24 black = { 0, 0, 0 };
 
-		records = fread(inbuffer, sizeof(long double), BUFSIZE, infile);
+		records = fread(inbuffer, sizeof(FLOAT), BUFSIZE, infile);
 
 		// if short read, and not EOF infile, shit broke, throw a fit.
 		if (BUFSIZE != records && !feof(infile)) fail(argv[1]);
@@ -78,7 +80,7 @@ int main (int argc, char **argv) {
 		// convert samples to rgb24 colors
 		for (size_t i = 0; i < records; i++)
 			outbuffer[i] = inbuffer[i] < 0 ? black : map.map[(size_t)(
-				map.size + fabsl(flatten(inbuffer[i])) *
+				map.size + FABS(flatten(inbuffer[i])) *
 				map.size / map.divider + map.shift
 			) % map.size];
 

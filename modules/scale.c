@@ -8,14 +8,13 @@ void usage (char *myself) {
 	exit(1);
 }
 
-#include <math.h>   	/* sin(), cos() */
 #include <complex.h>	/* complex */
 
 #include "constants.h"	/* M_PI */
 #include "loader.h" 	/* get_sampler() */
 #include "sampler.h"	/* sampler() */
 
-static long double radius;
+static FLOAT radius;
 static sampler(real_sample);
 
 __attribute__((cold))
@@ -31,7 +30,7 @@ void init (char **argv) {
 }
 
 __attribute__((pure hot))
-long double sample (long double complex *point) {
+FLOAT sample (complex FLOAT *point) {
 	*point *= radius;
 	return real_sample(point);
 }

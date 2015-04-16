@@ -2,9 +2,10 @@
 #include <stdio.h>  	/* asprintf() */
 #include <stdlib.h> 	/* atexit() */
 #include <dlfcn.h>  	/* dlopen(), dlsym(), dlclose() */
+#include <complex.h>	/* complex */
 
-#include "types.h"
 #include "utils.h"
+#include "config.h"
 
 // each module has its own copy of this compilation unit, so this variable is
 // not shared between any of them, despite it only being created once in the
@@ -14,8 +15,8 @@ __attribute__((cold)) static
 void dispose_sampler (void) { dlclose(sampler_handle); }
 
 __attribute__((cold))
-long double (*get_sampler (char **argv))(long double complex *) {
-	long double (*fn)(long double complex *);
+FLOAT (*get_sampler (char **argv))(complex FLOAT *) {
+	FLOAT (*fn)(complex FLOAT *);
 	void (*init)(char **);
 
 	if (sampler_handle)
@@ -45,7 +46,8 @@ long double (*get_sampler (char **argv))(long double complex *) {
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
-	if (!(fn = (long double (*)(long double complex *))dlsym(sampler_handle, "sample"))) {
+	if (!(fn = (FLOAT (*)(complex FLOAT *))dlsym(sampler_handle, "sample"))) {
+		printf("loader error: ");
 		tmp = dlerror();
 		die(tmp ? tmp : "NULL sampler not allowed");
 	}

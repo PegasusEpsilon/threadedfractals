@@ -9,8 +9,8 @@ void usage (char *myself) {
 	exit(1);
 }
 
-#include <complex.h>	/* complex, cabsl() */
-#include <math.h>   	/* log2l(), logl() */
+#include <complex.h>	/* complex, cabs*() */
+#include <math.h>   	/* log2*(), log*() */
 
 #include "loader.h"
 #include "complex_sampler.h"
@@ -29,7 +29,7 @@ void init (char **argv) {
 }
 
 __attribute__((pure hot))
-long double sample (long double complex *const z, long double complex *const c) {
-	long double count = complex_sample(z, c);
-	return count - log2l(logl(cabsl(*z)));
+FLOAT sample (complex FLOAT *const z, complex FLOAT *const c) {
+	FLOAT count = complex_sample(z, c);
+	return count - LOG2(LOG(CABS(*z)));
 }

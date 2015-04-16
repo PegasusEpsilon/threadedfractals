@@ -15,7 +15,7 @@ void usage (char *myself) {
 	exit(1);
 }
 
-static long double complex mandelbrot_coords;
+static complex FLOAT mandelbrot_coords;
 static sampler(complex_sample);
 
 __attribute__((cold))
@@ -24,8 +24,8 @@ void init (char **argv) {
 	int argc = 0;
 	while (argv[++argc]);
 	if (4 > argc) usage(argv[0]);
-	long double real = strtold(argv[1], NULL);
-	long double imag = strtold(argv[2], NULL);
+	FLOAT real = strtold(argv[1], NULL);
+	FLOAT imag = strtold(argv[2], NULL);
 	mandelbrot_coords = real + imag * I;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
@@ -34,7 +34,7 @@ void init (char **argv) {
 }
 
 __attribute__((pure hot))
-long double sample (long double complex *const point) {
-	long double complex copy = mandelbrot_coords;
+FLOAT sample (complex FLOAT *const point) {
+	complex FLOAT copy = mandelbrot_coords;
 	return complex_sample(point, &copy);
 }

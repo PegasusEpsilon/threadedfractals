@@ -2,6 +2,6 @@
 #define SAMPLER_H
 
 typedef int stfu_gcc;
-#define sampler(x) long double (*x) (long double complex *const)
+#define sampler(x) FLOAT (*x) (FLOAT complex *const)
 
 #endif /* SAMPLER_H */

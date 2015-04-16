@@ -13,9 +13,10 @@ void usage (char *myself) {
 }
 
 #include <stdbool.h>	/* true, false */
-#include <complex.h>	/* complex, cabsl() */
-#include <math.h>   	/* log2l(), logl() */
+#include <complex.h>	/* complex, cabs*(), creal*(), cimag*() */
+#include <math.h>   	/* sin*(), cos*(), sqrt*(), fabs*() */
 
+#include "config.h"
 #include "types.h"
 
 #define ESCAPE 16
@@ -33,26 +34,26 @@ void init (char **argv) {
 	trap.range = strtold(argv[1], NULL);
 	trap.start = atoi(argv[2]);
 	trap.angle = strtold(argv[3], NULL);
-	trap.sin = sinl(trap.angle);
-	trap.cos = cosl(trap.angle);
-	trap.hyp = sqrtl(trap.sin * trap.sin + trap.cos * trap.cos); /* squirtle! squirtle! */
+	trap.sin = SIN(trap.angle);
+	trap.cos = COS(trap.angle);
+	trap.hyp = SQRT(trap.sin * trap.sin + trap.cos * trap.cos);
 }
 
-__attribute__((pure hot))
-long double sample (long double complex *z_ptr, long double complex *c_ptr) {
-	long double complex z = *z_ptr, c = *c_ptr;
-	long double complex oz = 255 + 255 * I;
+__attribute__((pure hot visibility("default")))
+FLOAT sample (complex FLOAT *z_ptr, complex FLOAT *c_ptr) {
+	complex FLOAT z = *z_ptr, c = *c_ptr;
+	complex FLOAT oz = 255 + 255 * I;
 	unsigned i, deadline = 1;
-	long double d = (long double)((unsigned long long)-1);
+	FLOAT d = (FLOAT)((unsigned long long)-1);
 
 	for (i = 0; likely(i != (unsigned)-1); i++) {
-		if (unlikely(cabsl(z) > ESCAPE)) break;
+		if (unlikely(CABS(z) > ESCAPE)) break;
 		z = z * z + c;
 
 		if (i > trap.start) {
-			long double v, h, n;
-			v = fabsl(trap.sin * creall(z) + trap.cos * cimagl(z));
-			h = fabsl(trap.cos * creall(z) + trap.sin * cimagl(z));
+			FLOAT v, h, n;
+			v = FABS(trap.sin * CREAL(z) + trap.cos * CIMAG(z));
+			h = FABS(trap.cos * CREAL(z) + trap.sin * CIMAG(z));
 			n = (h < v ? h : v) / trap.hyp;
 			if (n < d) d = n;
 		}

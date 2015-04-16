@@ -14,9 +14,7 @@
 #include "utils.h"
 
 #define new(x) calloc(1, sizeof(x))
-#define line_t sample_t[max.real]
-
-typedef long double sample_t;
+#define line_t FLOAT[max.real]
 
 struct pixel max;
 list output_buffer;
@@ -46,7 +44,7 @@ unsigned long long output (list_buffer *line) {
 	pthread_mutex_lock(&write_lock);
 
 	while ((*line = list_read(output_buffer))) {
-		fwrite(**line, sizeof(sample_t), max.real, output_file);
+		fwrite(**line, sizeof(FLOAT), max.real, output_file);
 		pthread_cond_broadcast(&data_written);
 	}
 
@@ -69,17 +67,17 @@ unsigned long long output (list_buffer *line) {
 	return copy;
 }
 
-long double complex pixelsize;
-long double complex ratio;
+complex FLOAT pixelsize;
+complex FLOAT ratio;
 static sampler(sample);
 __attribute__((hot always_inline)) static inline
 void iterate_line (list_buffer *line, unsigned long long imag) {
-	long double complex point;
+	complex FLOAT point;
 	struct pixel this = { .imag = imag };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
 		point = pixel2vector(&this, &pixelsize, &ratio);
-		((sample_t *)**line)[this.real] = sample(&point);
+		((FLOAT *)**line)[this.real] = sample(&point);
 	}
 
 	list_mark_ready(*line);
@@ -121,7 +119,7 @@ int main (int argc, char **argv) {
 	max.real = atoi(argv[2]);
 	max.imag = atoi(argv[3]);
 	/* reverse vertical axis so positive = up */
-	ratio = 1 - (long double)max.imag / max.real * I;
+	ratio = 1 - (FLOAT)max.imag / max.real * I;
 	output_file = fopen(argv[4], "w");
 
 	/* cache some math */

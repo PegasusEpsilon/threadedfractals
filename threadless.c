@@ -10,7 +10,7 @@
 #include "mapper.h"
 #include "types.h"
 
-long double *buffer;
+FLOAT *buffer;
 FILE *output_file;
 unsigned long long next_line = 0;
 struct pixel max;
@@ -27,17 +27,17 @@ void display (void) {
 FILE *output_file;
 __attribute__((hot always_inline)) static inline
 void output (void) {
-	fwrite(buffer, sizeof(long double), max.real, output_file);
+	fwrite(buffer, sizeof(FLOAT), max.real, output_file);
 	display();
 	next_line++;
 }
 
-long double complex pixelsize;
-long double complex ratio;
+complex FLOAT pixelsize;
+complex FLOAT ratio;
 static sampler(sample);
 __attribute__((hot always_inline)) static inline
 void iterate_line () {
-	long double complex point;
+	complex FLOAT point;
 	struct pixel this = { .imag = next_line };
 
 	for (this.real = 0; this.real < max.real; this.real++) {
@@ -74,14 +74,14 @@ int main (int argc, char **argv) {
 
 	max.real = atoi(argv[1]);
 	max.imag = atoi(argv[2]);
-	ratio = 1 + (long double)max.imag / max.real * I;
+	ratio = 1 + (FLOAT)max.imag / max.real * I;
 	output_file = fopen(argv[3], "w");
 
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &ratio);
 
 	/* allocate output buffer */
-	buffer = calloc(max.real, sizeof(long double));
+	buffer = calloc(max.real, sizeof(FLOAT));
 	thread();
 	display();
 	puts("\n\nDone!");

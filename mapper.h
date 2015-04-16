@@ -6,15 +6,21 @@
  *  v1.0 -- pulled into seperate module
  */
 
+#ifndef MAPPER_H
+#define MAPPER_H
+
 #include "types.h"
+#include "config.h"
 
-long double complex calculate_pixelsize (
+FLOAT complex calculate_pixelsize (
 	const struct pixel *const,
-	const long double complex *const
+	const FLOAT complex *const
 );
 
-long double complex pixel2vector (
+FLOAT complex pixel2vector (
 	const struct pixel *const,
-	const long double complex *const,
-	const long double complex *const
+	const FLOAT complex *const,
+	const FLOAT complex *const
 );
+
+#endif /* MAPPER_H */

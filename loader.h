@@ -2,10 +2,11 @@
 #define LOADER_H
 
 #include <complex.h>
+#include "config.h"
 
 void *sampler_handle;
 
 __attribute__((cold))
-long double (*get_sampler (char **))(long double complex *);
+FLOAT (*get_sampler (char **))(FLOAT complex *);
 
 #endif /* LOADER_H */

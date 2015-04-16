@@ -1,19 +1,20 @@
 #include <stdio.h>  	/* printf(), puts() */
 #include <stdlib.h> 	/* exit() */
-#include <complex.h>	/* complex, cabsl() */
+#include <complex.h>	/* complex, cabs*() */
 #include <stdbool.h>	/* bool */
 
 #include "types.h"
+#include "config.h"
 
 #define ESCAPE 16
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
 #define unlikely(x) __builtin_expect(x, false)	/* branch prediction */
 
 __attribute__((pure hot always_inline)) static inline
-bool inset (long double complex c) {
-	long double r = creall(c), i = cimagl(c);
-	long double rm = r - 0.25, rp2 = r + 1, i2 = i * i;
-	long double t = rm * rm + i2; rp2 *= rp2;
+bool inset (complex FLOAT c) {
+	FLOAT r = CREAL(c), i = CIMAG(c);
+	FLOAT rm = r - 0.25, rp2 = r + 1, i2 = i * i;
+	FLOAT t = rm * rm + i2; rp2 *= rp2;
 	/* period 1 cardoid */
 	if (4 * t * (t + rm) / i2 < 1) return true;
 	/* period 2 disc */
@@ -30,7 +31,7 @@ void usage (const char *restrict const myself) {
 	exit(1);
 }
 
-static long double escape;
+static FLOAT escape;
 
 __attribute__((cold))
 void init (const char *restrict const *restrict const argv) {
@@ -41,18 +42,18 @@ void init (const char *restrict const *restrict const argv) {
 }
 
 __attribute__((pure hot))
-long double sample (
-	long double complex *const z_ptr,
-	long double complex *const c_ptr
+FLOAT sample (
+	complex FLOAT *const z_ptr,
+	complex FLOAT *const c_ptr
 ) {
-	long double complex z = *z_ptr, c = *c_ptr;
-	long double complex oz = (unsigned long long)-1 + (unsigned long long)-1 * I;
+	complex FLOAT z = *z_ptr, c = *c_ptr;
+	complex FLOAT oz = (unsigned long long)-1 + (unsigned long long)-1 * I;
 	unsigned i, deadline = 1;
 
 	if (inset(c)) return -1;
 
 	for (i = 0; likely(i != (unsigned)-1); i++) {
-		if (unlikely(cabsl(z) > escape)) break;
+		if (unlikely(CABS(z) > escape)) break;
 		z = z * z + c;
 
 		if (unlikely(oz == z)) return -1;

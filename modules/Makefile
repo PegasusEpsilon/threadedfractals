@@ -1,4 +1,3 @@
-CC=cc
 CFLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99 -fmax-errors=3
 DEPS=../loader.c ../utils.c
 
@@ -6,32 +5,39 @@ modules:
 	make julia.so mandelbrot.so crosstrap.so pointtrap.so renormalized.so \
 	escape_count.so rotate.so translate.so scale.so dragon.so levy.so
 
+# nothing special
 %.so: %.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-rotate.so:	rotate.c $(DEPS)
-	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
-
+# only deps
 translate.so:	translate.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 scale.so:	scale.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-renormalized.so:	renormalized.c $(DEPS)
-	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
-
-mandelbrot.so:	mandelbrot.c $(DEPS)
-	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
-
 julia.so:	julia.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
+# deps and math library
+rotate.so:	rotate.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+
+renormalized.so:	renormalized.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+
+mandelbrot.so:	mandelbrot.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+
+# no deps, just math
+crosstrap.so:	crosstrap.c
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+
 dragon.so:	dragon.c
-	$(CC) $(CFLAGS) -fPIC -shared $^ -lm -o $@
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
 levy.so:	levy.c
-	$(CC) $(CFLAGS) -fPIC -shared $^ -lm -o $@
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
 clean:
 	for spec in \
