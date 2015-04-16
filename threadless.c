@@ -68,13 +68,14 @@ void usage (char *myself) {
 }
 
 int main (int argc, char **argv) {
+
 	if (5 > argc) usage(argv[0]);
 
 	sample = get_sampler(&argv[4]);
 
 	max.real = atoi(argv[1]);
 	max.imag = atoi(argv[2]);
-	ratio = 1 + (FLOAT)max.imag / max.real * I;
+	ratio = 1 - (FLOAT)max.imag / max.real * I;
 	output_file = fopen(argv[3], "w");
 
 	/* cache some math */

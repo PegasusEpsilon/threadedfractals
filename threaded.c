@@ -1,10 +1,8 @@
-#define _GNU_SOURCE 	/* asprintf() */
-
 #include <stdio.h>  	/* printf(), puts(), fopen(), fwrite() */
 #include <stdlib.h> 	/* strtold() */
 #include <stdarg.h> 	/* va_list, va_start(), va_end() */
-#include <pthread.h>	/* pthread_* */
 #include <stdbool.h>	/* bool, true, false */
+#include <pthread.h>	/* pthread_* */
 
 #include "circularlist.h"
 #include "modules/sampler.h"
