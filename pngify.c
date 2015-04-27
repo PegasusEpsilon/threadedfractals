@@ -6,7 +6,6 @@
 #include <stddef.h>   	/* size_t */
 #include <stdio.h>    	/* fopen(), fread(), fwrite(), fclose() */
 #include <stdlib.h>   	/* exit() */
-#include <stdarg.h>   	/* va_list, va_start(), vprintf(), va_end() */
 #include <stdint.h>   	/* uint(8|16|32)_t */
 #include <zlib.h>     	/* z_stream, deflateInit2(), deflate(), crc32() */
 #include <arpa/inet.h>	/* htonl() - noop on network-order machines */

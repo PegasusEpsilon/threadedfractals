@@ -1,6 +1,5 @@
 #include <stdio.h>      	/* perror(), puts(), printf(), fopen(), fgets(), feof(), sscanf(), fclose(), fwrite() */
 #include <stdlib.h>     	/* exit(), realloc(), calloc(), free(), size_t */
-#include <stdarg.h>     	/* va_list, va_start(), vprintf(), va_end() */
 #ifdef _WIN32
 #	include <stdint.h>  	/* uint8_t */
 #	define PRIuSIZET "Iu"
