@@ -5,7 +5,7 @@
 #include <unistd.h> 	/* stat(), fork(), execvpe() */
 #include <signal.h> 	/* signal(), SIGCHLD, SIG_IGN */
 #include <stdlib.h> 	/* malloc(), exit() */
-#include <stdio.h>  	/* printf(), puts() */
+#include <stdio.h>  	/* printf(), puts(), perror() */
 #include <string.h> 	/* strlen() */
 
 #ifdef _WIN32

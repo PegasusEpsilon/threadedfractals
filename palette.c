@@ -1,4 +1,4 @@
-#include <stdio.h>      	/* perror(), puts(), printf(), fopen(), fgets(), feof(), sscanf(), fclose(), fwrite() */
+#include <stdio.h>      	/* puts(), printf(), fopen(), fgets(), feof(), sscanf(), fclose(), fwrite() */
 #include <stdlib.h>     	/* exit(), realloc(), calloc(), free(), size_t */
 #ifdef _WIN32
 #	include <stdint.h>  	/* uint8_t */
