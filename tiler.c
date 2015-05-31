@@ -86,12 +86,14 @@ FILE *spawn_compressor (
 		extension = split_filename_ext(outfile);
 	}
 
-	int i;
-	if (ptr.byname.fifo) i = asprintf(ptr.byname.fifo, "%s" NUMBERS_FMT FIFO_EXT, outfile, y, x);
-	if (ptr.byname.file) i = asprintf(ptr.byname.file, "%s" NUMBERS_FMT ".%s", outfile, y, x, extension);
-	if (ptr.byname.width) i = asprintf(ptr.byname.width, "%" PRIuSIZET, width);
-	if (ptr.byname.height) i = asprintf(ptr.byname.height, "%" PRIuSIZET, height);
-	(void)i;
+	{
+		int i;
+		if (ptr.byname.fifo) i = asprintf(ptr.byname.fifo, "%s" NUMBERS_FMT FIFO_EXT, outfile, y, x);
+		if (ptr.byname.file) i = asprintf(ptr.byname.file, "%s" NUMBERS_FMT ".%s", outfile, y, x, extension);
+		if (ptr.byname.width) i = asprintf(ptr.byname.width, "%" PRIuSIZET, width);
+		if (ptr.byname.height) i = asprintf(ptr.byname.height, "%" PRIuSIZET, height);
+		(void)i;
+	}
 
 	if (mkfifo(*ptr.byname.fifo, 0600)) perror(*ptr.byname.fifo);
 
