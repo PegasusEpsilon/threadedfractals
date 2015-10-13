@@ -41,19 +41,19 @@ struct png_iend {
 	struct png_chunk header;
 } __attribute__((packed));
 
-__attribute__((pure cold noreturn))
+__attribute__((cold noreturn))
 void usage (const char *restrict const myself) {
 	printf("Usage: %s infile width height outfile\n", myself);
 	exit(1);
 }
 
-__attribute__((pure hot always_inline)) static inline
+__attribute__((hot always_inline)) static inline
 void crc_write (const void *data, size_t size, FILE *stream, uint32_t *crc) {
 	*crc = crc32(*crc, data, size);
 	if (1 != fwrite(data, size, 1, stream) || ferror(stream)) fail("crc_write");
 }
 
-__attribute__((pure hot always_inline)) static inline
+__attribute__((hot always_inline)) static inline
 void fwrite_chunk (
 	struct png_chunk *restrict const chunk, FILE *restrict const file
 ) {
