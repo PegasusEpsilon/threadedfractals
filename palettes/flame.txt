@@ -1,0 +1,18 @@
+# Fire palette
+
+LEN	1530
+
+RGB 0.00 0.0 # black
+GRN 0.40 0.0
+RED 0.60 1.0
+BLU 0.80 0.0
+BLU 0.95 1.0
+GRN 0.95 1.0
+RED 0.95 1.0
+RGB 1.00 0.8 0.8 1.0
+
+# red peaks at 6600
+# blue < 2000 = 0
+# blue > 6500 = 255
+# white
+
