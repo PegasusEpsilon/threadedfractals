@@ -8,13 +8,15 @@
 #include <inttypes.h>
 #include <complex.h>
 
+#include "config.h"
+
 /* would be nice if we could have long long unsigned complex in C99
  * but as it is, such things are GCC extensions. so we won't use them.
  */
 struct pixel { long long unsigned real, imag; };
 
 struct trap {
-	long double angle, range, sin, cos, hyp;
+	FLOAT angle, range, sin, cos, hyp;
 	uint32_t start;
 };
 
