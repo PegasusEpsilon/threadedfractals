@@ -6,9 +6,6 @@
 #include "types.h"
 #include "config.h"
 
-__attribute__((cold))
-void init (const char *restrict const *restrict const argv) { (void)argv; }
-
 __attribute__((pure hot)) static
 complex FLOAT F1 (complex FLOAT z) { return z * (1 + I); }
 
