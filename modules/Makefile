@@ -1,9 +1,11 @@
-CFLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
+FLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
 DEPS=../loader.c ../utils.c
 
-ifneq ($(shell uname),Darwin)
+ifeq ($(shell uname),Darwin)
+	CFLAGS=$(FLAGS)
+else
 	# clang no likey this flag
-	CFLAGS=$(CFLAGS) -fmax-errors=3
+	CFLAGS=$(FLAGS) -fmax-errors=3
 endif
 
 modules:

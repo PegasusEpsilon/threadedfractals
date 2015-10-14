@@ -1,12 +1,14 @@
 CC=cc
-CFLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
+FLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
 HEADERS=circularlist.h loader.h mapper.h utils.h types.h modules/sampler.h
 OBJECTS=circularlist.o loader.o mapper.o utils.o
 DEPS=$(HEADERS) $(OBJECTS)
 
-ifneq ($(shell uname),Darwin)
+ifeq ($(shell uname),Darwin)
+	CFLAGS=$(FLAGS)
+else
 	# clang no likey this flag
-	CFLAGS=$(CFLAGS) -fmax-errors=3
+	CFLAGS=$(FLAGS) -fmax-errors=3
 endif
 
 default:	pngify resample render palette threaded threadless modules
