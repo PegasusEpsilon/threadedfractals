@@ -3,7 +3,7 @@
 
 __attribute__((cold noreturn always_inline)) static inline
 void usage (char *myself) {
-	printf("Usage: ... %s SAMPLER ARGS", myself);
+	printf("Usage: ... %s SAMPLER ARGS\n", myself);
 	puts("	SAMPLER	shared object file containing sampler function");
 	puts("	ARGS	any arguments needed by SAMPLER");
 	exit(1);
