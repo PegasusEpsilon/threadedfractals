@@ -1,6 +1,10 @@
 #!/bin/bash
 
-THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+if [ -f /proc/cpuinfo ]; then
+	THREADS=$(cat /proc/cpuinfo | grep processor | wc -l)
+else
+	THREADS=$(sysctl -n hw.activecpu)
+fi
 MSAA=1
 SIZE_REAL=1920
 SIZE_IMAG=1080
