@@ -23,10 +23,7 @@ void init (char **argv) {
 	while (argv[++argc]);
 	if (3 > argc) usage(argv[0]);
 	radius = strtold(argv[1], NULL);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-pedantic"
 	real_sample = (sampler())get_sampler(&argv[2]);
-#pragma GCC diagnostic pop
 }
 
 __attribute__((pure hot))

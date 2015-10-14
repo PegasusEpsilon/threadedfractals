@@ -27,10 +27,7 @@ void init (char **argv) {
 	FLOAT real = strtold(argv[1], NULL);
 	FLOAT imag = strtold(argv[2], NULL);
 	mandelbrot_coords = real + imag * I;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-pedantic"
 	complex_sample = (sampler())get_sampler(&argv[3]);
-#pragma GCC diagnostic pop
 }
 
 __attribute__((pure hot))

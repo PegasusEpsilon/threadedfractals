@@ -16,7 +16,7 @@ void dispose_sampler (void) { dlclose(sampler_handle); }
 
 __attribute__((cold))
 FLOAT (*get_sampler (char **argv))(complex FLOAT *) {
-	FLOAT (*fn)(complex FLOAT *);
+	FLOAT (*fn)(complex FLOAT *) = 0;
 	void (*init)(char **);
 
 	if (sampler_handle)
@@ -44,17 +44,14 @@ FLOAT (*get_sampler (char **argv))(complex FLOAT *) {
 /* We have officially left the realm of portability.
  * To port this to Windows will now require DLL shenanigans and some #ifdefs.
  */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-pedantic"
-	if (!(fn = (FLOAT (*)(complex FLOAT *))dlsym(sampler_handle, "sample"))) {
+	if (!(*(void **)(&fn) = dlsym(sampler_handle, "sample"))) {
 		printf("loader error: ");
 		tmp = dlerror();
 		die(tmp ? tmp : "NULL sampler not allowed");
 	}
 
-	if ((init = (void (*)(char **))dlsym(sampler_handle, "init")))
+	if ((*(void **)(&init) = dlsym(sampler_handle, "init")))
 		init(argv);
-#pragma GCC diagnostic pop
 
 	return fn;
 }

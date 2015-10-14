@@ -22,10 +22,7 @@ void init (char **argv) {
 	int argc = 0;
 	while (argv[++argc]);
 	if (1 > argc) usage(argv[0]);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-pedantic"
 	complex_sample = (sampler())get_sampler(&argv[1]);
-#pragma GCC diagnostic pop
 }
 
 __attribute__((pure hot))
