@@ -1,7 +1,13 @@
 CC=cc
-CFLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99 -fmax-errors=3
-DEPS=circularlist.h circularlist.o loader.h loader.o mapper.h mapper.o \
-	 utils.h utils.o types.h modules/sampler.h
+CFLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
+HEADERS=circularlist.h loader.h mapper.h utils.h types.h modules/sampler.h
+OBJECTS=circularlist.o loader.o mapper.o utils.o
+DEPS=$(HEADERS) $(OBJECTS)
+
+ifneq ($(shell uname),Darwin)
+	# clang no likey this flag
+	CFLAGS=$(CFLAGS) -fmax-errors=3
+endif
 
 default:	pngify resample render palette threaded threadless modules
 
@@ -18,10 +24,10 @@ palette:	palette.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 threaded:	threaded.c $(DEPS)
-	$(CC) $(CFLAGS) $^ -o $@ -lm -lpthread -ldl
+	$(CC) $(CFLAGS) $< $(OBJECTS) -o $@ -lm -lpthread -ldl
 
 threadless:	threadless.c $(DEPS)
-	$(CC) $(CFLAGS) $^ -o $@ -lm -ldl
+	$(CC) $(CFLAGS) $< $(OBJECTS) -o $@ -lm -ldl
 
 .PHONY:	modules
 

@@ -1,5 +1,10 @@
-CFLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99 -fmax-errors=3
+CFLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
 DEPS=../loader.c ../utils.c
+
+ifneq ($(shell uname),Darwin)
+	# clang no likey this flag
+	CFLAGS=$(CFLAGS) -fmax-errors=3
+endif
 
 modules:
 	make julia.so mandelbrot.so crosstrap.so pointtrap.so renormalized.so \
