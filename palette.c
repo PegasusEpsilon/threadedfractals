@@ -236,14 +236,14 @@ int main (int argc, char **argv) {
 			/* Tested and fixed. Not sure it's the best way, though. */
 			debug("read RGB control point %lf", x);
 			add_syncpoint(channels, x, line+i, &syncdiff);
-			if (&printf == debug) putchar('\n');
+			if (debug_enabled()) putchar('\n');
 		} else
 			printf("Warning: Unknown statement in config file: %s\n", line+i);
 	}
 	fclose(infile);
 
 	/* debug? print the parsed directives */
-	if (&printf == debug)
+	if (debug_enabled())
 		printparsed(channels);
 	/* make sure we got a gradient length */
 	if (!gradient.length) die("Config must specify a gradient length (LEN)");
@@ -253,7 +253,7 @@ int main (int argc, char **argv) {
 	/* actually generate the palette */
 	generate_palette(channels, &gradient);
 	/* debug? print the final palette data */
-	if (&printf == debug)
+	if (debug_enabled())
 		printoutput(&gradient);
 
 	/* write the palette to outfile */

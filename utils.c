@@ -1,6 +1,7 @@
 #include <stdlib.h>   	/* exit() */
 #include <stdarg.h>   	/* va_list, va_start(), vprintf(), va_end() */
 #include <stdio.h>    	/* perror() puts() */
+#include <stdbool.h>  	/* bool */
 
 /* Print errno error message and exit with errorlevel */
 __attribute__((cold noreturn))
@@ -32,3 +33,4 @@ int debug_on  (const char *restrict const fmt, ...) {
 }
 int (*debug)(const char *, ...) = &debug_off;
 void enable_debug (void) { debug = &debug_on; }
+bool debug_enabled (void) { return debug == &debug_on; }
