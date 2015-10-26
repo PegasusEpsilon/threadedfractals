@@ -66,8 +66,6 @@ struct gradient *generate_palette (const struct channel *channels, struct gradie
 			double y;
 			/* x = horizontal coordinate ("timestamp") of the point */
 			double x = (double)i / (double)gradient->length;
-			/* dx = distance between A and B on the X axis (delta t of [a, b]) */
-			double dx = fmod(1 + channels[c].points[b].x - channels[c].points[a].x, 1.0);
 
 			/* Move forward through the given points until we
 			 * find one we haven't surpassed yet. Any points
@@ -79,7 +77,13 @@ struct gradient *generate_palette (const struct channel *channels, struct gradie
 				if (channels[c].points[b].x < channels[c].points[a].x) channels[c].points[b].x++;
 			}
 
-			x -= channels[c].points[a].x;	/* shift X */
+			/* dx = distance between A and B on the X axis (delta t of [a, b]) */
+			/* this must be done after the point walking loop above, not before */
+			double dx = fmod(1 + channels[c].points[b].x - channels[c].points[a].x, 1.0);
+
+			/* don't shift if we're using x = 1.0 as the pretend x = 0.0 */
+			if (channels[c].points[a].x != 1.0)
+				x -= channels[c].points[a].x;	/* shift X */
 			if (dx) /* no divide by zero please */
 				x /= dx;	/* scale X */
 			else if (channels[c].points[a].x == channels[c].points[b].x)
