@@ -22,7 +22,6 @@ void init (char **argv) {
 	int argc = 0;
 	while (argv[++argc]);
 	if (2 > argc) usage(argv[0]);
-	printf("args: %d\n", argc);
 	complex_sample = (sampler())get_sampler(&argv[1]);
 }
 
