@@ -42,7 +42,7 @@ struct png_iend {
 
 __attribute__((cold noreturn))
 void usage (const char *restrict const myself) {
-	printf("Usage: %s infile width height outfile\n", myself);
+	printf("Usage: %s [-v] [-32] infile width height outfile\n", myself);
 	exit(1);
 }
 
@@ -91,6 +91,7 @@ int main (int argc, char **argv) {
 	FILE *ifile, *ofile;
 	long idat_start, idat_size;
 	uint32_t crc = 0, height, width, scanline;
+	uint8_t channels = 3;
 
 	z_stream stream = {
 		.zalloc = Z_NULL,
@@ -138,15 +139,22 @@ int main (int argc, char **argv) {
 		.type = *(uint32_t *)"IEND"
 	} };
 
-	/* Turn on verbose, maybe */
-	if (1 < argc && *(uint16_t *)"-v" == *(uint16_t *)argv[1]) {
-		enable_debug();
+	/* Deal with optional command-line arguments */
+	while (argv[1] && '-' == *argv[1]) {
+		if (*(uint32_t *)"-32" == *(uint32_t *)argv[1]) {
+			/* RGBA (32bpp, PNG32) */
+			debug("Enabled PNG32...");
+			ihdr.color_type = 6;
+			channels = 4;
+		} else if (*(uint16_t *)"-v" == *(uint16_t *)argv[1])
+			enable_debug();
+		else printf("Unknown flag %s ignored.\n", argv[1]);
 		argv[1] = argv[0];
 		argc--;
 		argv++;
 	}
 
-	/* Make sure we've got our args */
+	/* Make sure we've still got our args */
 	if (4 > argc) usage(argv[0]);
 
 	/* Open our files */
@@ -156,7 +164,7 @@ int main (int argc, char **argv) {
 	/* Process width and height arguments */
 	width = atol(argv[2]);
 	height = atol(argv[3]);
-	scanline = width * 3;
+	scanline = width * channels;
 
 	/* Write the PNG magic */
 	fwrite(png_magic, (size_t)8, (size_t)1, ofile);
@@ -166,7 +174,7 @@ int main (int argc, char **argv) {
 	ihdr.height = htonl(height);
 	fwrite_chunk((struct png_chunk *)&ihdr, ofile);
 
-	debug("writing %s, %sx%s...", argv[4], argv[2], argv[3]);
+	debug("writing %s, %sx%s...\n", argv[4], argv[2], argv[3]);
 
 	/* Build a single IDAT chunk as a stream.
 	 * Read, compress, write, for maximum compression efficiency.
@@ -215,7 +223,7 @@ int main (int argc, char **argv) {
 
 	/* calculate IDAT size */
 	idat_start = ftell(ofile) - idat_start;
-	debug("IDAT size: %lu\n", idat_start);
+	debug("IDAT size: %lu (%08x) bytes\n", idat_start, idat_start);
 	idat_start = htonl(idat_start);
 
 	/* Write the CRC, in network byte order */
