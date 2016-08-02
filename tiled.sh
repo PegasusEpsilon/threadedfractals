@@ -18,7 +18,7 @@ trap cleanup 1 2 4 5 6 7 8 11 13 14 15
 
 make palette threaded modules render resample tiler pngify || exit
 ./palette palettes/blueglow.txt palette.bin
-./tiler tiled.rgb $SIZE_REAL $SIZE_IMAG 20 20 threaded.png ./pngify {infile} {width} {height} {outfile} &
+./tiler tiled.rgb $SIZE_REAL $SIZE_IMAG 20 20 threaded.png ./pngify/pngify {infile} {width} {height} {outfile} &
 ./resample tiled.msaa $SIZE_REAL $MSAA tiled.rgb &
 ./render $FLATTEN tiled.map palette.bin 0 $DIVIDER tiled.msaa &
 echo ./threaded $THREADS $MSAA_REAL $MSAA_IMAG tiled.map $SAMPLER

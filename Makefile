@@ -13,9 +13,6 @@ endif
 
 default:	pngify resample render palette threaded threadless modules
 
-pngify:	pngify.c utils.o
-	$(CC) $(CFLAGS) $^ -o $@ -lz
-
 resample:	resample.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -31,10 +28,13 @@ threaded:	threaded.c $(DEPS)
 threadless:	threadless.c $(DEPS)
 	$(CC) $(CFLAGS) $< $(OBJECTS) -o $@ -lm -ldl
 
-.PHONY:	modules
+.PHONY:	modules pngify
 
 modules:
 	$(MAKE) -C modules
+
+pngify:
+	$(MAKE) -C pngify
 
 clean:
 	for spec in \
@@ -42,7 +42,8 @@ clean:
 		julia.rgb threaded.rgb threadless.rgb \
 		julia.msaa threaded.msaa threadless.msaa palette.bin \
 		julia.map threaded.map threadless.map \
-		*.o threaded threadless palette render resample tiler pngify \
+		*.o threaded threadless palette render resample tiler \
 	; do test -e $$spec && rm $$spec \
 	; done || true
 	$(MAKE) clean -C modules
+	$(MAKE) clean -C pngify
