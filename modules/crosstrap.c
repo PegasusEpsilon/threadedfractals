@@ -13,7 +13,7 @@ void usage (char *myself) {
 }
 
 #include <stdbool.h>	/* true, false */
-#include <complex.h>	/* complex, cabs*(), creal*(), cimag*() */
+#include <complex.h>	/* complex, cabs*() */
 #include <math.h>   	/* sin*(), cos*(), sqrt*(), fabs*() */
 
 #include "config.h"
