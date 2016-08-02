@@ -1,6 +1,6 @@
-/* zlib-only PNG writer
+/* zlib-only PNG24 writer
  * by Pegasus Epsilon <pegasus@pimpninjas.org>
- * (C) 2012 Distribute Unmodified
+ * (C) 2012-2016 Distribute Unmodified
  */
 
 #include <stddef.h>   	/* size_t */
@@ -76,19 +76,21 @@ int output (
 	static uint8_t buffer[Z_CHUNK];
 	size_t ready;
 
-	stream->next_out = buffer;
-	stream->avail_out = Z_CHUNK;
+	do {
+		stream->next_out = buffer;
+		stream->avail_out = Z_CHUNK;
+		if (Z_STREAM_ERROR == deflate(stream, flush)) die("zlib killed itself");
+		if ((ready = Z_CHUNK - stream->avail_out))
+			crc_write(buffer, ready, file, crc);
+	} while (0 == stream->avail_out);
 
-	if (Z_STREAM_ERROR == deflate(stream, flush)) die("zlib killed itself");
-	if ((ready = Z_CHUNK - stream->avail_out))
-		crc_write(buffer, ready, file, crc);
 	return !stream->avail_out;
 }
 
 int main (int argc, char **argv) {
 	FILE *ifile, *ofile;
 	long idat_start, idat_size;
-	uint32_t crc = 0, height, width;
+	uint32_t crc = 0, height, width, scanline;
 
 	z_stream stream = {
 		.zalloc = Z_NULL,
@@ -105,8 +107,8 @@ int main (int argc, char **argv) {
 		/* we can easily encode other pixel formats, but we only care about
 		 * 24bpp truecolor images at the moment.
 		 */
-		.bit_depth = 8,	/* 24bpp */
-		.color_type = 2,	/* color */
+		.bit_depth = 8,	/* 8 bits per channel */
+		.color_type = 2,	/* RGB (24bpp, PNG24) */
 		/* the PNG spec allows only one compression method. despite the spec's
 		 * statements, the stream must be a full zlib stream, with zlib header,
 		 * adler32 footer (for the decompressed data), and an extra additional
@@ -116,11 +118,13 @@ int main (int argc, char **argv) {
 		/* we don't bother with any filtering, just shoving the raw pixel data
 		 * to zlib. We *may* get better results with filtering, but exploring
 		 * that problem space takes more time than we're willing to spend on
-		 * this simple application of the PNG spec.
+		 * this simple application of the PNG spec. Besides, we beat every
+		 * PNG compressor I've found, (except optipng, which we generally tie),
+		 * already.
 		 */
 		.filter_method = 0,	/* adaptive */
 		/* interlacing brings a lot of code complexity,
-		 * with very limited benefit. don't bother.
+		 * with very limited (if any) benefit. don't bother.
 		 */
 		.interlace_method = 0	/* progressive scan */
 		/* NOTE: Despite the radical simplification of the potential outputs by
@@ -152,8 +156,7 @@ int main (int argc, char **argv) {
 	/* Process width and height arguments */
 	width = atol(argv[2]);
 	height = atol(argv[3]);
-	if (3 * width > Z_CHUNK)
-		die("Encoding images wider than %d pixels is not implemented", Z_CHUNK / 3);
+	scanline = width * 3;
 
 	/* Write the PNG magic */
 	fwrite(png_magic, (size_t)8, (size_t)1, ofile);
@@ -189,15 +192,24 @@ int main (int argc, char **argv) {
 
 	/* Compress the stream */
 	uint8_t input[Z_CHUNK] = { 0 };
-	uint32_t i = 0; int flush = Z_NO_FLUSH;;
-	while (i < height) {
+	for (uint32_t i = 0; i < height; i++) {
+		input[0] = 0; // row filter type zero = no filter
 		stream.next_in = input;
-		stream.avail_in = (uInt)1 + 3 * fread(&input[1], 3, width, ifile);
-		if (ferror(ifile)) fail(argv[1]);
-		if (++i == height) flush = Z_FINISH;
-		while (output(&stream, flush, ofile, &crc));
+		stream.avail_in = (uInt)1;
+		output(&stream, Z_NO_FLUSH, ofile, &crc);
+
+		uint32_t chunk;
+		for (uint32_t j = 0; j != scanline; j += chunk) {
+			uint32_t left = scanline - j;
+			chunk = left > Z_CHUNK ? Z_CHUNK : left;
+			stream.next_in = input;
+			stream.avail_in = fread(input, 1, chunk, ifile);
+			if (ferror(ifile)) fail(argv[1]);
+			output(&stream, Z_NO_FLUSH, ofile, &crc);
+		}
 	}
 	/* Finish up */
+	output(&stream, Z_FINISH, ofile, &crc);
 	fclose(ifile);
 	deflateEnd(&stream);
 
