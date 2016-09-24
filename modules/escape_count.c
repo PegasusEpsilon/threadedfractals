@@ -45,7 +45,6 @@ void init (const char *restrict const *restrict const argv) {
 	escape = strtold(argv[1], NULL);
 }
 
-__attribute__((pure))
 __attribute__((hot))
 FLOAT sample (
 	complex FLOAT *const z_ptr,
@@ -66,7 +65,7 @@ FLOAT sample (
 	}
 
 	/* set magnitude for the renormalizer */
-	/* is this a violation of function purity? */
+	/* this violates function purity requirements */
 	*z_ptr = z;
 
 	return i;
