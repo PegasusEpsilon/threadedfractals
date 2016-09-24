@@ -4,14 +4,16 @@
 #include <stdbool.h>  	/* bool */
 
 /* Print errno error message and exit with errorlevel */
-__attribute__((cold noreturn))
+__attribute__((cold))
+__attribute__((noreturn))
 void fail (const char *restrict const msg) {
 	perror(msg);
 	exit(1);
 }
 
 /* Print custom message and exit with errorlevel */
-__attribute__((cold noreturn))
+__attribute__((cold))
+__attribute__((noreturn))
 void die (const char *restrict const fmt, ...) {
 	va_list args;
 	va_start(args, fmt);

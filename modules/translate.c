@@ -1,7 +1,9 @@
 #include <stdio.h>  	/* printf(), puts() */
 #include <stdlib.h> 	/* exit() */
 
-__attribute__((cold noreturn always_inline)) static inline
+__attribute__((cold))
+__attribute__((noreturn))
+__attribute__((always_inline)) static inline
 void usage (char *myself) {
 	printf("Usage: ... %s REAL IMAG\n", myself);
 	puts("	REAL	amount to shift rightward on the complex plane");
@@ -30,7 +32,8 @@ void init (char **argv) {
 	real_sample = (sampler())get_sampler(&argv[3]);
 }
 
-__attribute__((pure hot))
+__attribute__((pure))
+__attribute__((hot))
 FLOAT sample (complex FLOAT *point) {
 	*point += center;
 	return real_sample(point);

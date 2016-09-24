@@ -18,7 +18,8 @@ struct pixel max;
 list output_buffer;
 unsigned long long thread_count, *queue, next_line = 0;
 
-__attribute__((hot always_inline)) static inline
+__attribute__((hot))
+__attribute__((always_inline)) static inline
 void display (void) {
 	/* queue */
 	printf("Q: ");
@@ -37,7 +38,8 @@ void display (void) {
 pthread_mutex_t write_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t data_written = PTHREAD_COND_INITIALIZER;
 FILE *output_file;
-__attribute__((hot always_inline)) static inline
+__attribute__((hot))
+__attribute__((always_inline)) static inline
 unsigned long long output (list_buffer *line) {
 	pthread_mutex_lock(&write_lock);
 
@@ -68,7 +70,8 @@ unsigned long long output (list_buffer *line) {
 complex FLOAT pixelsize;
 complex FLOAT ratio;
 static sampler(sample);
-__attribute__((hot always_inline)) static inline
+__attribute__((hot))
+__attribute__((always_inline)) static inline
 void iterate_line (list_buffer *line, unsigned long long imag) {
 	complex FLOAT point;
 	struct pixel this = { .imag = imag };
@@ -93,7 +96,9 @@ static void *thread (void *ptr) {
 	return NULL;
 }
 
-__attribute__((cold noreturn always_inline)) static inline
+__attribute__((cold))
+__attribute__((noreturn))
+__attribute__((always_inline)) static inline
 void usage (char *myself) {
 	puts("Threaded fractal sampler\n");
 	printf("Usage: %s THREADS WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);

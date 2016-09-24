@@ -6,13 +6,16 @@
 #include "types.h"
 #include "config.h"
 
-__attribute__((pure hot)) static
+__attribute__((pure))
+__attribute__((hot)) static
 complex FLOAT F1 (complex FLOAT z) { return z * (1 + I); }
 
-__attribute__((pure hot)) static
+__attribute__((pure))
+__attribute__((hot)) static
 complex FLOAT F2 (complex FLOAT z) { return (2 + z) * (1 - I); }
 
-__attribute__((hot always_inline)) static inline
+__attribute__((hot))
+__attribute__((always_inline)) static inline
 FLOAT recurse (
 	complex FLOAT (*) (complex FLOAT),
 	complex FLOAT (*) (complex FLOAT),
@@ -34,7 +37,8 @@ FLOAT mutate (
 	return recurse(f1, f2, z, trap);
 }
 
-__attribute__((hot always_inline)) static inline
+__attribute__((hot))
+__attribute__((always_inline)) static inline
 FLOAT recurse (
 	complex FLOAT (*f1) (complex FLOAT),
 	complex FLOAT (*f2) (complex FLOAT),

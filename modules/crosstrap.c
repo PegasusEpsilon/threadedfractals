@@ -1,7 +1,9 @@
 #include <stdio.h>  	/* puts() */
 #include <stdlib.h> 	/* exit() */
 
-__attribute__((cold noreturn always_inline)) static inline
+__attribute__((cold))
+__attribute__((noreturn))
+__attribute__((always_inline)) static inline
 void usage (char *myself) {
 	printf("Usage: ... %s RANGE START ANGLE\n", myself);
 	puts("	RANGE	range within which a trap takes effect");
@@ -39,7 +41,9 @@ void init (char **argv) {
 	trap.hyp = SQRT(trap.sin * trap.sin + trap.cos * trap.cos);
 }
 
-__attribute__((pure hot visibility("default")))
+__attribute__((pure))
+__attribute__((hot))
+__attribute__((visibility("default")))
 FLOAT sample (complex FLOAT *z_ptr, complex FLOAT *c_ptr) {
 	complex FLOAT z = *z_ptr, c = *c_ptr;
 	complex FLOAT oz = 255 + 255 * I;

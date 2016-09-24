@@ -10,7 +10,9 @@
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
 #define unlikely(x) __builtin_expect(x, false)	/* branch prediction */
 
-__attribute__((pure hot always_inline)) static inline
+__attribute__((pure))
+__attribute__((hot))
+__attribute__((always_inline)) static inline
 bool inset (complex FLOAT c) {
 	FLOAT r = CREAL(c), i = CIMAG(c);
 	FLOAT rm = r - 0.25, rp2 = r + 1, i2 = i * i;
@@ -24,7 +26,9 @@ bool inset (complex FLOAT c) {
 	return false;
 }
 
-__attribute__((cold noreturn always_inline)) static inline
+__attribute__((cold))
+__attribute__((noreturn))
+__attribute__((always_inline)) static inline
 void usage (const char *restrict const myself) {
 	printf("Usage: ... %s RADIUS\n", myself);
 	puts("	RADIUS	radius outside which a point is considered to have escaped");
@@ -41,7 +45,8 @@ void init (const char *restrict const *restrict const argv) {
 	escape = strtold(argv[1], NULL);
 }
 
-__attribute__((pure hot))
+__attribute__((pure))
+__attribute__((hot))
 FLOAT sample (
 	complex FLOAT *const z_ptr,
 	complex FLOAT *const c_ptr
