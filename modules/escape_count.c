@@ -66,6 +66,7 @@ FLOAT sample (
 	}
 
 	/* set magnitude for the renormalizer */
+	/* is this a violation of function purity? */
 	*z_ptr = z;
 
 	return i;
