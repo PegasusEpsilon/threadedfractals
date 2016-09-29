@@ -5,9 +5,10 @@ __attribute__((cold))
 __attribute__((noreturn))
 __attribute__((always_inline)) static inline
 void usage (char *myself) {
-	printf("Usage: ... %s SAMPLER ARGS\n", myself);
+	printf("Usage: ... %s SAMPLER ARGS\n\n", myself);
 	puts("	SAMPLER	shared object file containing sampler function");
 	puts("	ARGS	any arguments needed by SAMPLER");
+	puts("\nReport bugs to pegasus@pimpninjas.org");
 	exit(1);
 }
 

@@ -6,11 +6,12 @@ __attribute__((cold))
 __attribute__((noreturn))
 __attribute__((always_inline)) static inline
 void usage (char *myself) {
-	printf("Usage: ... %s RANGE START\n", myself);
+	printf("Usage: ... %s RANGE START\n\n", myself);
 	puts("	RANGE	range within which a trap takes effect");
 	puts("		Note: larger ranges make bigger points");
 	puts("	START	iteration on which to start trapping");
 	puts("		Note: higher values remove more foreground points");
+	puts("\nReport bugs to pegasus@pimpninjas.org");
 	exit(1);
 }
 

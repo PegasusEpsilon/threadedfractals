@@ -5,8 +5,11 @@ __attribute__((cold))
 __attribute__((noreturn))
 __attribute__((always_inline)) static inline
 void usage (char *myself) {
-	printf("Usage: ... %s SCALE\n", myself);
+	printf("Usage: ... %s SCALE SAMPLER ARGS\n\n", myself);
 	puts("	SCALE	smaller = zoom more");
+	puts("	SAMPLER	shared object file containing complex sampler function");
+	puts("	ARGS	any extra arguments required by the complex sampler");
+	puts("\nReport bugs to pegasus@pimpninjas.org");
 	exit(1);
 }
 

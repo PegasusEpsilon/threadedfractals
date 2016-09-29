@@ -10,6 +10,16 @@
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
 #define unlikely(x) __builtin_expect(x, false)	/* branch prediction */
 
+__attribute__((cold))
+__attribute__((noreturn))
+__attribute__((always_inline)) static inline
+void usage (const char *restrict const myself) {
+	printf("Usage: ... %s RADIUS\n\n", myself);
+	puts("	RADIUS	radius outside which a point is considered to have escaped");
+	puts("\nReport bugs to pegasus@pimpninjas.org");
+	exit(1);
+}
+
 __attribute__((pure))
 __attribute__((hot))
 __attribute__((always_inline)) static inline
@@ -26,17 +36,7 @@ bool inset (complex FLOAT c) {
 	return false;
 }
 
-__attribute__((cold))
-__attribute__((noreturn))
-__attribute__((always_inline)) static inline
-void usage (const char *restrict const myself) {
-	printf("Usage: ... %s RADIUS\n", myself);
-	puts("	RADIUS	radius outside which a point is considered to have escaped");
-	exit(1);
-}
-
 static FLOAT escape;
-
 __attribute__((cold))
 void init (const char *restrict const *restrict const argv) {
 	int argc = 0;

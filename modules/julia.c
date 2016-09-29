@@ -9,11 +9,12 @@ __attribute__((cold))
 __attribute__((noreturn))
 __attribute__((always_inline)) static inline
 void usage (char *myself) {
-	printf("Usage: ... %s SEED_REAL SEED_IMAG SAMPLER ARGS\n", myself);
+	printf("Usage: ... %s SEED_REAL SEED_IMAG SAMPLER ARGS\n\n", myself);
 	puts("	SEED_REAL	real coordinates on the mandelbrot plane");
 	puts("	SEED_IMAG	imaginary coordinates on the mandelbrot plane");
 	puts("	SAMPLER	shared object file containing complex sampler function");
 	puts("	ARGS	any extra arguments required by the complex sampler");
+	puts("\nReport bugs to pegasus@pimpninjas.org");
 	exit(1);
 }
 
