@@ -59,7 +59,7 @@ FLOAT sample (complex FLOAT *z_ptr, complex FLOAT *c_ptr) {
 		if (i > trap.start) {
 			FLOAT v, h, n;
 			v = FABS(trap.sin * CREAL(z) + trap.cos * CIMAG(z));
-			h = FABS(trap.cos * CREAL(z) + trap.sin * CIMAG(z));
+			h = FABS(trap.cos * CREAL(z) - trap.sin * CIMAG(z));
 			n = (h < v ? h : v) / trap.hyp;
 			if (n < d) d = n;
 		}
