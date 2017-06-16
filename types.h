@@ -16,7 +16,7 @@
 struct pixel { long long unsigned real, imag; };
 
 struct trap {
-	FLOAT angle, range, sin, cos, hyp;
+	FLOAT theta, range, sin, cos, hyp;
 	uint32_t start;
 };
 

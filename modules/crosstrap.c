@@ -21,6 +21,7 @@ void usage (char *myself) {
 
 #include "config.h"
 #include "types.h"
+#include "constants.h" /* M_PI */
 
 #define ESCAPE 16
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
@@ -36,9 +37,9 @@ void init (char **argv) {
 	if (4 > argc) usage(argv[0]);
 	trap.range = strtold(argv[1], NULL);
 	trap.start = atoi(argv[2]);
-	trap.angle = strtold(argv[3], NULL);
-	trap.sin = SIN(trap.angle);
-	trap.cos = COS(trap.angle);
+	trap.theta = M_PI * strtold(argv[3], NULL) / 180;
+	trap.sin = SIN(trap.theta);
+	trap.cos = COS(trap.theta);
 	trap.hyp = SQRT(trap.sin * trap.sin + trap.cos * trap.cos);
 }
 
