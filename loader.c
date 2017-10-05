@@ -1,3 +1,8 @@
+/* loader.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #define _GNU_SOURCE 	/* asprintf() */
 #include <stdio.h>  	/* asprintf() */
 #include <stdlib.h> 	/* atexit() */
@@ -7,9 +12,10 @@
 #include "utils.h"
 #include "config.h"
 
-// each module has its own copy of this compilation unit, so this variable is
-// not shared between any of them, despite it only being created once in the
-// codebase
+/* each module has its own copy of this compilation unit, so this variable is
+ * not shared between any of them, despite it only being created once in the
+ * codebase
+ */
 static void *sampler_handle = NULL;
 __attribute__((cold)) static
 void dispose_sampler (void) { dlclose(sampler_handle); }

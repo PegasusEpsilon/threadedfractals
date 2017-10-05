@@ -1,3 +1,8 @@
+/* threaded.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #include <stdio.h>  	/* printf(), puts(), fopen(), fwrite() */
 #include <stdlib.h> 	/* strtold() */
 #include <stdarg.h> 	/* va_list, va_start(), va_end() */

@@ -1,3 +1,8 @@
+/* resample.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #include <inttypes.h>	/* uint8_t, uint32_t */
 #include <stdio.h>   	/* printf() */
 #include <stdlib.h>  	/* exit() */

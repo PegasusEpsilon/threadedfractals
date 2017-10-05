@@ -1,3 +1,8 @@
+/* palette.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #include <stdio.h>      	/* puts(), printf(), fopen(), fgets(), feof(), sscanf(), fclose(), fwrite() */
 #include <stdlib.h>     	/* exit(), realloc(), calloc(), free(), size_t */
 #ifdef _WIN32

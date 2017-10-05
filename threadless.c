@@ -1,3 +1,8 @@
+/* threadless.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #define _XOPEN_SOURCE 600	/* pthread_barrier_* */
 
 #include <stdio.h>  	/* printf(), puts(), fopen(), fwrite() */

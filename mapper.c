@@ -1,3 +1,8 @@
+/* mapper.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #include <complex.h>	/* complex, creal*(), cimag*() */
 #include "types.h"
 #include "config.h"

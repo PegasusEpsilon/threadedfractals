@@ -1,3 +1,8 @@
+/* render.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #define _POSIX_SOURCE 	/* fileno() */
 #include <stdio.h>    	/* printf(), puts(), FILE, fopen(), fwrite(), fclose(), fileno() */
 #include <stdlib.h>   	/* exit(), atoi(), atof() */
@@ -61,6 +66,9 @@ int main (int argc, char **argv) {
 		map.size = (size_t)info.st_size;
 	}
 	map.map = mmap(NULL, map.size, PROT_READ, MAP_SHARED, map.fd, (size_t)0);
+	/* we divide the map size here, instead of in the block above,
+	 * so we don't have to multiply in the immediately preceding line.
+	 */
 	map.size /= 3;
 	map.shift = atoi(argv[3]);
 	map.divider = strtold(argv[4], NULL);

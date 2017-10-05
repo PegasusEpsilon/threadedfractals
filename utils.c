@@ -1,3 +1,8 @@
+/* utils.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #include <stdlib.h>   	/* exit() */
 #include <stdarg.h>   	/* va_list, va_start(), vprintf(), va_end() */
 #include <stdio.h>    	/* perror() puts() */

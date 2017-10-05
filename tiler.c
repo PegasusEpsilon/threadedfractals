@@ -1,3 +1,8 @@
+/* tiler.c, from threadedfractals
+ * by "Pegasus Epsilon" <pegasus@pimpninjas.org>
+ * Distribute Unmodified - http://pegasus.pimpninjas.org/license
+ */
+
 #define _GNU_SOURCE	/* asprintf(), execvpe() */
 #include <sys/types.h>	/* stat(), mkfifo(), wait() */
 #include <sys/stat.h>	/* stat(), mkfifo() */
