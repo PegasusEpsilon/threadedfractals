@@ -7,7 +7,7 @@
  */
 
 /* Oh hey, this file is C, not Objective-C. I wonder if there's any way to
- * make git get that right?
+ * make github get that right?
  */
 
 #ifndef CONSTANTS_H
