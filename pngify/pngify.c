@@ -9,7 +9,6 @@
 #include <stdint.h>   	/* uint(8|16|32)_t */
 #include <zlib.h>     	/* z_stream, deflateInit2(), deflate(), crc32() */
 #include <arpa/inet.h>	/* htonl() - noop on network-order machines */
-#include <string.h>
 
 #include "utils.h"
 
