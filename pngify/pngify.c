@@ -1,6 +1,6 @@
 /* zlib-only PNG24 writer
  * by Pegasus Epsilon <pegasus@pimpninjas.org>
- * (C) 2012-2016 Distribute Unmodified
+ * (C) 2012-2017 Distribute Unmodified
  */
 
 #include <stddef.h>   	/* size_t */
