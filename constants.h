@@ -6,10 +6,6 @@
  *  1.0 -- pulled into seperate header
  */
 
-/* Oh hey, this file is C, not Objective-C. I wonder if there's any way to
- * make github get that right?
- */
-
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 #ifndef M_PI
