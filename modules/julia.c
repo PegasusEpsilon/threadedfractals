@@ -5,9 +5,7 @@
 #include "loader.h"
 #include "complex_sampler.h"
 
-__attribute__((cold))
-__attribute__((noreturn))
-__attribute__((always_inline)) static inline
+__attribute__((cold, noreturn, always_inline)) static inline
 void usage (char *myself) {
 	printf("Usage: ... %s SEED_REAL SEED_IMAG SAMPLER ARGS\n\n", myself);
 	puts("	SEED_REAL	real coordinates on the mandelbrot plane");
@@ -33,8 +31,7 @@ void init (char **argv) {
 	complex_sample = (sampler())get_sampler(&argv[3]);
 }
 
-__attribute__((pure))
-__attribute__((hot))
+__attribute__((hot, pure))
 FLOAT sample (complex FLOAT *const point) {
 	complex FLOAT copy = mandelbrot_coords;
 	return complex_sample(point, &copy);

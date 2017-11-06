@@ -20,8 +20,7 @@ FILE *output_file;
 unsigned long long next_line = 0;
 struct pixel max;
 
-__attribute__((hot))
-__attribute__((always_inline)) static inline
+__attribute__((hot, always_inline)) static inline
 void display (void) {
 	printf(
 		"%llu/%llu (%02.02f%%)\x1b[K\r",
@@ -31,8 +30,7 @@ void display (void) {
 }
 
 FILE *output_file;
-__attribute__((hot))
-__attribute__((always_inline)) static inline
+__attribute__((hot, always_inline)) static inline
 void output (void) {
 	fwrite(buffer, sizeof(FLOAT), max.real, output_file);
 	display();
@@ -42,8 +40,7 @@ void output (void) {
 complex FLOAT pixelsize;
 complex FLOAT ratio;
 static sampler(sample);
-__attribute__((hot))
-__attribute__((always_inline)) static inline
+__attribute__((hot, always_inline)) static inline
 void iterate_line () {
 	complex FLOAT point;
 	struct pixel this = { .imag = next_line };
@@ -54,8 +51,7 @@ void iterate_line () {
 	}
 }
 
-__attribute__((cold))
-__attribute__((always_inline)) static inline
+__attribute__((cold, always_inline)) static inline
 void thread (void) {
 	do {
 		iterate_line();
@@ -63,9 +59,7 @@ void thread (void) {
 	} while (next_line != max.imag);
 }
 
-__attribute__((cold))
-__attribute__((noreturn))
-__attribute__((always_inline)) static inline
+__attribute__((cold, noreturn, always_inline)) static inline
 void usage (char *myself) {
 	puts("Unthreaded fractal sampler\n");
 	printf("Usage: %s WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);

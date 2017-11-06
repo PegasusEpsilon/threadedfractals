@@ -1,9 +1,7 @@
 #include <stdio.h>  	/* printf(), puts() */
 #include <stdlib.h> 	/* exit() */
 
-__attribute__((cold))
-__attribute__((noreturn))
-__attribute__((always_inline)) static inline
+__attribute__((cold, noreturn, always_inline)) static inline
 void usage (char *myself) {
 	printf("Usage: ... %s SCALE SAMPLER ARGS\n\n", myself);
 	puts("	SCALE	smaller = zoom more");
@@ -31,8 +29,7 @@ void init (char **argv) {
 	real_sample = (sampler())get_sampler(&argv[2]);
 }
 
-__attribute__((pure))
-__attribute__((hot))
+__attribute__((hot, pure))
 FLOAT sample (complex FLOAT *point) {
 	*point *= radius;
 	return real_sample(point);
