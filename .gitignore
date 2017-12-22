@@ -1,5 +1,6 @@
 old
 pasture
+tags
 *.o
 *.so
 *.bin
