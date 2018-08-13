@@ -173,14 +173,14 @@ int main (int argc, char **argv) {
 	FILE *outfile;
 
 	/* handle the verbose flag */
-	if (1 < argc && *(uint16_t *)"-v" == *(uint16_t *)argv[1]) {
+	if (2 < argc && *(uint16_t *)"-v" == *(uint16_t *)argv[1]) {
 		enable_debug();
 		argc--;
 		argv[1] = argv[0];
 		argv++;
 	}
 
-	if (argc < 2)
+	if (argc < 3)
 		usage(argv[0]);
 
 	/* init all storage */
