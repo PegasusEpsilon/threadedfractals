@@ -23,8 +23,8 @@ struct pixel max;
 __attribute__((hot, always_inline)) static inline
 void display (void) {
 	printf(
-		"%llu/%llu (%02.02f%%)\x1b[K\r",
-		next_line, max.imag, next_line / (float)max.imag * 100
+		"%llu/%llu (%02.02" FMT "%%)\x1b[K\r",
+		next_line, max.imag, next_line / (FLOAT)max.imag * 100
 	);
 	fflush(stdout);
 }

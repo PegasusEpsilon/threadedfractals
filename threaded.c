@@ -30,12 +30,12 @@ void display (void) {
 	for (unsigned long long i = 0; i < thread_count; i++)
 		printf("%llu, ", queue[i]);
 	/* progress */
-	printf("P: %llu/%llu (%0.2f%%), ", next_line, max.imag,
-		100 * (float)next_line / max.imag);
+	printf("P: %llu/%llu (%0.2" FMT "%%), ", next_line, max.imag,
+		100 * (FLOAT)next_line / max.imag);
 	/* buffer */
 	unsigned long long used = list_used(output_buffer);
 	unsigned long long length = list_length(output_buffer);
-	printf("B: %llu/%llu (%0.2f%%)\x1b[K\r", used, length, 100 * (float)used / length);
+	printf("B: %llu/%llu (%0.2" FMT "%%)\x1b[K\r", used, length, 100 * (FLOAT)used / length);
 	fflush(stdout);
 }
 
