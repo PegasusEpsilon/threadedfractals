@@ -13,7 +13,7 @@ void usage (char *myself) {
 #include <complex.h>	/* complex, cabs*() */
 #include <math.h>   	/* log2*(), log*() */
 
-#include "loader.h"
+#include "complex_loader.h"
 #include "complex_sampler.h"
 
 static sampler(complex_sample);

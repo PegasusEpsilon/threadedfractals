@@ -2,7 +2,7 @@
 #include <stdlib.h>	/* exit() */
 
 #include "types.h"
-#include "loader.h"
+#include "complex_loader.h"
 #include "complex_sampler.h"
 
 __attribute__((cold, noreturn, always_inline)) static inline

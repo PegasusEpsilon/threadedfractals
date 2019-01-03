@@ -10,7 +10,7 @@ void usage (char *myself) {
 	exit(1);
 }
 
-#include "loader.h"         	/* get_sampler() */
+#include "complex_loader.h"         	/* get_sampler() */
 #include "complex_sampler.h"	/* sampler() */
 
 static sampler(complex_sample);

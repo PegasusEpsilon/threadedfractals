@@ -1,5 +1,5 @@
 FLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
-DEPS=../loader.c ../utils.c
+DEPS=../utils.c
 
 ifeq ($(shell uname),Darwin)
 	CFLAGS=$(FLAGS)
@@ -17,23 +17,23 @@ modules:
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 # only deps
-translate.so:	translate.c $(DEPS)
+translate.so:	translate.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-scale.so:	scale.c $(DEPS)
+scale.so:	scale.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-julia.so:	julia.c $(DEPS)
+julia.so:	julia.c ../complex_loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 # deps and math library
-rotate.so:	rotate.c $(DEPS)
+rotate.so:	rotate.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
-renormalized.so:	renormalized.c $(DEPS)
+renormalized.so:	renormalized.c ../complex_loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
-mandelbrot.so:	mandelbrot.c $(DEPS)
+mandelbrot.so:	mandelbrot.c ../complex_loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
 # no deps, just math
