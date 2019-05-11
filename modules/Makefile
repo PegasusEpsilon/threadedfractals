@@ -23,17 +23,17 @@ translate.so:	translate.c ../loader.c $(DEPS)
 scale.so:	scale.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-julia.so:	julia.c ../complex_loader.c $(DEPS)
+julia.so:	julia.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 # deps and math library
 rotate.so:	rotate.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
-renormalized.so:	renormalized.c ../complex_loader.c $(DEPS)
+renormalized.so:	renormalized.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
-mandelbrot.so:	mandelbrot.c ../complex_loader.c $(DEPS)
+mandelbrot.so:	mandelbrot.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
 # no deps, just math

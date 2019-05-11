@@ -13,8 +13,9 @@ void usage (char *myself) {
 #include <complex.h>	/* complex, cabs*() */
 #include <math.h>   	/* log2*(), log*() */
 
-#include "complex_loader.h"
-#include "complex_sampler.h"
+#define COMPLEX
+#include "loader.h"
+#include "sampler.h"
 
 static sampler(complex_sample);
 

@@ -21,8 +21,13 @@ __attribute__((cold)) static
 void dispose_sampler (void) { dlclose(sampler_handle); }
 
 __attribute__((cold))
+#ifdef COMPLEX
+FLOAT (*get_sampler (char **argv))(complex FLOAT *, complex FLOAT *) {
+	FLOAT (*fn)(complex FLOAT *, complex FLOAT *) = 0;
+#else
 FLOAT (*get_sampler (char **argv))(complex FLOAT *) {
 	FLOAT (*fn)(complex FLOAT *) = 0;
+#endif
 	void (*init)(char **);
 
 	if (sampler_handle)

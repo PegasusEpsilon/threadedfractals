@@ -1,6 +1,6 @@
 CC=cc
-FLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
-HEADERS=circularlist.h loader.h mapper.h utils.h types.h modules/sampler.h
+FLAGS=-g -Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
+HEADERS=config.h circularlist.h loader.h mapper.h utils.h types.h modules/sampler.h
 OBJECTS=circularlist.o loader.o mapper.o utils.o
 DEPS=$(HEADERS) $(OBJECTS)
 

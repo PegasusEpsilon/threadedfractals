@@ -2,8 +2,9 @@
 #include <stdlib.h>	/* exit() */
 
 #include "types.h"
-#include "complex_loader.h"
-#include "complex_sampler.h"
+#define COMPLEX
+#include "loader.h"
+#include "sampler.h"
 
 __attribute__((cold, noreturn, always_inline)) static inline
 void usage (char *myself) {
