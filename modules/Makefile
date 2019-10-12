@@ -10,7 +10,8 @@ endif
 
 modules:
 	make julia.so mandelbrot.so crosstrap.so pointtrap.so renormalized.so \
-	escape_count.so rotate.so translate.so scale.so dragon.so levy.so
+	escape_count.so rotate.so translate.so scale.so dragon.so levy.so \
+	mirror.so flip.so
 
 # nothing special
 %.so: %.c
@@ -18,6 +19,12 @@ modules:
 
 # only deps
 translate.so:	translate.c ../loader.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
+
+mirror.so:	mirror.c ../loader.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
+
+flip.so:	flip.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 scale.so:	scale.c ../loader.c $(DEPS)
@@ -48,8 +55,8 @@ levy.so:	levy.c
 
 clean:
 	for spec in \
-		renormalized.so pointtrap.so crosstrap.so \
-		mandelbrot.so julia.so escape_count.so \
+		renormalized.so pointtrap.so crosstrap.so flip.so \
+		mandelbrot.so julia.so escape_count.so mirror.so \
 		rotate.so translate.so scale.so dragon.so levy.so\
 	; do test -e $$spec && rm $$spec \
 	; done || true
