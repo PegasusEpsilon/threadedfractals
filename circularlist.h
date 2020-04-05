@@ -1,6 +1,8 @@
 #ifndef CIRCULAR_LIST_H
 #define CIRCULAR_LIST_H
 
+#define new(x) calloc(1, sizeof(x))
+
 typedef void *list;
 typedef void **list_buffer;
 

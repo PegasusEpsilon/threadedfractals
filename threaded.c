@@ -16,7 +16,6 @@
 #include "types.h"
 #include "utils.h"
 
-#define new(x) calloc(1, sizeof(x))
 #define line_t FLOAT[max.real]
 
 struct pixel max;
