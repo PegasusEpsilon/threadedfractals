@@ -13,13 +13,13 @@
 	#define FLOAT float
 	#define LOG logf
 	#define LOG2 log2f
-	#define SIN sinf
-	#define COS cosf
-	#define CABS cabsf
-	#define FABS fabsf
-	#define SQRT sqrtf
-	#define CREAL crealf
-	#define CIMAG cimagf
+	#define SIN(x) sinf(x)
+	#define COS(x) cosf(x)
+	#define FABS(x) fabsf(x)
+	#define SQRT(x) sqrtf(x)
+	#define CABS(z) cabsf(z)
+	#define CREAL(z) crealf(z)
+	#define CIMAG(z) cimagf(z)
 	#define FMT "f"
 #endif
 
@@ -28,13 +28,13 @@
 	#define FLOAT double
 	#define LOG log
 	#define LOG2 log2
-	#define SIN sin
-	#define COS cos
-	#define CABS cabs
-	#define FABS fabs
-	#define SQRT sqrt
-	#define CREAL creal
-	#define CIMAG cimag
+	#define SIN(x) sin(x)
+	#define COS(x) cos(x)
+	#define FABS(x) fabs(x)
+	#define SQRT(x) sqrt(x)
+	#define CABS(z) cabs(z)
+	#define CREAL(z) creal(z)
+	#define CIMAG(z) cimag(z)
 	#define FMT "f"
 #endif
 #endif
@@ -43,14 +43,20 @@
 	#define FLOAT long double
 	#define LOG logl
 	#define LOG2 log2l
-	#define SIN sinl
-	#define COS cosl
-	#define CABS cabsl
-	#define FABS fabsl
-	#define SQRT sqrtl
-	#define CREAL creall
-	#define CIMAG cimagl
+	#define SIN(x) sinl(x)
+	#define COS(x) cosl(x)
+	#define FABS(x) fabsl(x)
+	#define SQRT(x) sqrtl(x)
+	#define CABS(z) cabsl(z)
+	#define CREAL(z) creall(z)
+	#define CIMAG(z) cimagl(z)
 	#define FMT "Lf"
+#endif
+
+#ifdef SINGLE
+#ifdef LONGDOUBLE
+#warn Only one (or none!) of SINGLE or LONGDOUBLE should be defined!
+#endif
 #endif
 
 #endif // CONFIG_H
