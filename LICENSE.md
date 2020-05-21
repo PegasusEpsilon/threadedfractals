@@ -289,3 +289,22 @@ Well, they can't have my software. I wrote it. It's mine. And I intend to
 keep it. But they can play with it, learn from it, and use it. So long as
 they distribute it -- unmodified.
 
+### Addendum (May 21 2020)
+
+For the first time in nearly 14 years, this page is getting an update. Others
+have expressed an appreciation for this license, so I'm adding this:
+
+The contents of this license may be considered to be governed by this license.
+If you like my license, you are welcome to use it as the license under which
+you release your own projects.
+
+As I cannot personally guarantee that my website will remain online forever,
+I encourage you to copy the contents of the page and distribute it along with
+your projects, but as the license itself dictates, you must distribute a full
+unmodified copy of the license. If you wish to modify the terms of the license
+for your project, I recommend adding a LICENSE.patch in your project, or
+something similar, though there are plenty of other licenses available out
+there. CC BY-SA is reasonably similar, for example.
+
+The original text of this license can be found online, for as long as I am
+able to keep it online, at https://pegasus.pimpninjas.org/license
