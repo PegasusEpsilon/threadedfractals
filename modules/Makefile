@@ -41,7 +41,7 @@ renormalized.so:	renormalized.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
 mandelbrot.so:	mandelbrot.c ../loader.c $(DEPS)
-	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
 # no deps, just math
 crosstrap.so:	crosstrap.c
