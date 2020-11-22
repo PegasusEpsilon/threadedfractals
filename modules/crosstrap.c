@@ -42,9 +42,9 @@ void init (char **argv) {
 }
 
 __attribute__((pure, hot))
-FLOAT sample (complex FLOAT *z_ptr, complex FLOAT *c_ptr) {
-	complex FLOAT z = *z_ptr, c = *c_ptr;
-	complex FLOAT oz = 255 + 255 * I;
+FLOAT sample (COMPLEX *z_ptr, COMPLEX *c_ptr) {
+	COMPLEX z = *z_ptr, c = *c_ptr;
+	COMPLEX oz = 255 + 255 * I;
 	unsigned i, deadline = 1;
 	FLOAT d = (FLOAT)((unsigned long long)-1);
 

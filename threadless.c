@@ -37,12 +37,12 @@ void output (void) {
 	next_line++;
 }
 
-complex FLOAT pixelsize;
-complex FLOAT ratio;
+COMPLEX pixelsize;
+COMPLEX ratio;
 static sampler(sample);
 __attribute__((hot, always_inline)) static inline
 void iterate_line () {
-	complex FLOAT point;
+	COMPLEX point;
 	struct pixel this = { .imag = next_line };
 
 	for (this.real = 0; this.real < max.real; this.real++) {

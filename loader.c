@@ -22,11 +22,11 @@ void dispose_sampler (void) { dlclose(sampler_handle); }
 
 __attribute__((cold))
 #ifdef COMPLEX
-FLOAT (*get_sampler (char **argv))(complex FLOAT *, complex FLOAT *) {
-	FLOAT (*fn)(complex FLOAT *, complex FLOAT *) = 0;
+FLOAT (*get_sampler (char **argv))(COMPLEX *, COMPLEX *) {
+	FLOAT (*fn)(COMPLEX *, COMPLEX *) = NULL;
 #else
-FLOAT (*get_sampler (char **argv))(complex FLOAT *) {
-	FLOAT (*fn)(complex FLOAT *) = 0;
+FLOAT (*get_sampler (char **argv))(COMPLEX *) {
+	FLOAT (*fn)(COMPLEX *) = NULL;
 #endif
 	void (*init)(char **);
 

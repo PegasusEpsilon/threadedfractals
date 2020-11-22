@@ -13,7 +13,7 @@ void usage (char *myself) {
 #include <complex.h>	/* complex, cabs*() */
 #include <math.h>   	/* log2*(), log*() */
 
-#define COMPLEX
+#define COMPLEX_SAMPLER
 #include "loader.h"
 #include "sampler.h"
 
@@ -28,7 +28,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *const z, complex FLOAT *const c) {
+FLOAT sample (COMPLEX *const z, COMPLEX *const c) {
 	FLOAT count = complex_sample(z, c);
 	return count - LOG2(LOG(CABS(*z)));
 }

@@ -69,12 +69,12 @@ unsigned long long output (list_buffer *line) {
 	return copy;
 }
 
-complex FLOAT pixelsize;
-complex FLOAT ratio;
+COMPLEX pixelsize;
+COMPLEX ratio;
 static sampler(sample);
 __attribute__((hot, always_inline)) static inline
 void iterate_line (list_buffer *line, unsigned long long imag) {
-	complex FLOAT point;
+	COMPLEX point;
 	struct pixel this = { .imag = imag };
 
 	for (this.real = 0; this.real < max.real; this.real++) {

@@ -29,7 +29,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *point) {
+FLOAT sample (COMPLEX *point) {
 	*point *= radius;
 	return real_sample(point);
 }

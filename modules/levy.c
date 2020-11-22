@@ -7,23 +7,17 @@
 #include "config.h"
 
 __attribute__((hot, pure)) static
-complex FLOAT F1 (complex FLOAT z) { return z * (1 + I); }
+COMPLEX F1 (COMPLEX z) { return z * (1 + I); }
 
 __attribute__((hot, pure)) static
-complex FLOAT F2 (complex FLOAT z) { return (2 + z) * (1 - I); }
+COMPLEX F2 (COMPLEX z) { return (2 + z) * (1 - I); }
 
 __attribute__((hot, always_inline)) static inline
-FLOAT recurse (
-	complex FLOAT (*) (complex FLOAT),
-	complex FLOAT (*) (complex FLOAT),
-	complex FLOAT, FLOAT
-);
+FLOAT recurse (COMPLEX (*) (COMPLEX), COMPLEX (*) (COMPLEX), COMPLEX, FLOAT);
 
 __attribute__((hot)) static
 FLOAT mutate (
-	complex FLOAT (*f1) (complex FLOAT),
-	complex FLOAT (*f2) (complex FLOAT),
-	complex FLOAT z, FLOAT trap
+	COMPLEX (*f1) (COMPLEX), COMPLEX (*f2) (COMPLEX), COMPLEX z, FLOAT trap
 ) {
 	z = f1(z);
 	trap *= SQRT(2);
@@ -36,9 +30,7 @@ FLOAT mutate (
 
 __attribute__((hot, always_inline)) static inline
 FLOAT recurse (
-	complex FLOAT (*f1) (complex FLOAT),
-	complex FLOAT (*f2) (complex FLOAT),
-	complex FLOAT z, FLOAT trap
+	COMPLEX (*f1) (COMPLEX), COMPLEX (*f2) (COMPLEX), COMPLEX z, FLOAT trap
 ) {
 	FLOAT one = mutate(f1, f2, z, trap);
 	if (0 > one) return one;
@@ -48,6 +40,6 @@ FLOAT recurse (
 }
 
 __attribute__((hot))
-FLOAT sample (complex FLOAT *const z) {
+FLOAT sample (COMPLEX *const z) {
 	return recurse(F1, F2, *z, (FLOAT)1/4000);
 }

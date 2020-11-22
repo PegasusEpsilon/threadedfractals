@@ -7,9 +7,9 @@
 #include "types.h"
 #include "config.h"
 
-complex FLOAT calculate_pixelsize (
-	const struct pixel *const img,
-	const complex FLOAT *const radius
+__attribute__((pure, cold))
+COMPLEX calculate_pixelsize (
+	const struct pixel *const img, const COMPLEX *const radius
 ) {
 	return (
 		2 * CREAL(*radius) / (img->real - 1) +
@@ -21,10 +21,9 @@ complex FLOAT calculate_pixelsize (
  * between two consecutive pixels, and adding the difference instead,
  * will slowly build rounding errors. don't do that.
  */
-complex FLOAT pixel2vector (
+COMPLEX pixel2vector (
 	const struct pixel *const in,
-	const complex FLOAT *const size,
-	const complex FLOAT *const radius
+	const COMPLEX *const size, const COMPLEX *const radius
 ) {
 	return in->real * CREAL(*size) + in->imag * CIMAG(*size) * I - *radius;
 }

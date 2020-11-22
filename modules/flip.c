@@ -26,7 +26,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *point) {
+FLOAT sample (COMPLEX *point) {
 	// I feel like there should be a simpler operation here...
 	*point = CREAL(*point) - CIMAG(*point) * I;
 	return real_sample(point);

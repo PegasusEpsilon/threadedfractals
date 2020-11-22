@@ -19,7 +19,7 @@ void usage (const char *restrict const myself) {
 }
 
 __attribute__((hot, pure, always_inline)) static inline
-bool inset (complex FLOAT c) {
+bool inset (COMPLEX c) {
 	FLOAT r = CREAL(c), i = CIMAG(c);
 	FLOAT rm = r - 0.25, rp2 = r + 1, i2 = i * i;
 	FLOAT t = rm * rm + i2; rp2 *= rp2;
@@ -42,12 +42,9 @@ void init (const char *restrict const *restrict const argv) {
 }
 
 __attribute__((hot))
-FLOAT sample (
-	complex FLOAT *const z_ptr,
-	complex FLOAT *const c_ptr
-) {
-	complex FLOAT z = *z_ptr, c = *c_ptr;
-	complex FLOAT oz = (unsigned long long)-1 + (unsigned long long)-1 * I;
+FLOAT sample (COMPLEX *const z_ptr, COMPLEX *const c_ptr) {
+	COMPLEX z = *z_ptr, c = *c_ptr;
+	COMPLEX oz = (unsigned long long)-1 + (unsigned long long)-1 * I;
 	unsigned i, deadline = 1;
 
 	if (inset(c)) return -1;

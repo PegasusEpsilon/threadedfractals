@@ -18,7 +18,7 @@ void usage (char *myself) {
 #include "loader.h" 	/* get_sampler() */
 #include "config.h"
 
-static complex FLOAT theta = 0;
+static COMPLEX theta = 0;
 static sampler(real_sample);
 
 __attribute__((cold))
@@ -33,7 +33,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *point) {
+FLOAT sample (COMPLEX *point) {
 	*point *= theta;
 	return real_sample(point);
 }

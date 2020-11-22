@@ -7,10 +7,10 @@
 void *sampler_handle;
 
 __attribute__((cold))
-#ifdef COMPLEX
-FLOAT (*get_sampler (char **))(FLOAT complex *, FLOAT complex *);
+#ifdef COMPLEX_SAMPLER
+FLOAT (*get_sampler (char **))(COMPLEX *, COMPLEX *);
 #else
-FLOAT (*get_sampler (char **))(FLOAT complex *);
+FLOAT (*get_sampler (char **))(COMPLEX *);
 #endif
 
 #endif /* LOADER_H */

@@ -10,7 +10,7 @@ void usage (char *myself) {
 	exit(1);
 }
 
-#define COMPLEX
+#define COMPLEX_SAMPLER
 #include "loader.h"         	/* get_sampler() */
 #include "sampler.h"	/* sampler() */
 
@@ -26,7 +26,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *const point) {
-	complex FLOAT zero = 0 + 0 * I;
+FLOAT sample (COMPLEX *const point) {
+	COMPLEX zero = 0 + 0 * I;
 	return complex_sample(&zero, point);
 }

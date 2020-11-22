@@ -17,7 +17,7 @@ void usage (char *myself) {
 #include "loader.h" 	/* get_sampler() */
 #include "sampler.h"	/* sampler() */
 
-static complex FLOAT center;
+static COMPLEX center;
 static sampler(real_sample);
 
 __attribute__((cold))
@@ -34,7 +34,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *point) {
+FLOAT sample (COMPLEX *point) {
 	*point += center;
 	return real_sample(point);
 }

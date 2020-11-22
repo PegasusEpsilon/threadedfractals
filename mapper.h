@@ -12,15 +12,10 @@
 #include "types.h"
 #include "config.h"
 
-FLOAT complex calculate_pixelsize (
-	const struct pixel *const,
-	const FLOAT complex *const
-);
+COMPLEX calculate_pixelsize (const struct pixel *const, const COMPLEX *const);
 
-FLOAT complex pixel2vector (
-	const struct pixel *const,
-	const FLOAT complex *const,
-	const FLOAT complex *const
+COMPLEX pixel2vector (
+	const struct pixel *const, const COMPLEX *const, const COMPLEX *const
 );
 
 #endif /* MAPPER_H */

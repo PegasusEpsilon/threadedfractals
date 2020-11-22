@@ -2,7 +2,7 @@
 #include <stdlib.h>	/* exit() */
 
 #include "types.h"
-#define COMPLEX
+#define COMPLEX_SAMPLER
 #include "loader.h"
 #include "sampler.h"
 
@@ -17,7 +17,7 @@ void usage (char *myself) {
 	exit(1);
 }
 
-static complex FLOAT mandelbrot_coords;
+static COMPLEX mandelbrot_coords;
 static sampler(complex_sample);
 
 __attribute__((cold))
@@ -33,7 +33,7 @@ void init (char **argv) {
 }
 
 __attribute__((hot, pure))
-FLOAT sample (complex FLOAT *const point) {
-	complex FLOAT copy = mandelbrot_coords;
+FLOAT sample (COMPLEX *const point) {
+	COMPLEX copy = mandelbrot_coords;
 	return complex_sample(point, &copy);
 }
