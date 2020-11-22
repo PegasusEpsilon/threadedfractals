@@ -17,7 +17,7 @@ modules:
 %.so: %.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-# only deps
+# no libs, just deps
 translate.so:	translate.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
@@ -33,7 +33,7 @@ scale.so:	scale.c ../loader.c $(DEPS)
 julia.so:	julia.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-# deps and math library
+# deps and libs
 rotate.so:	rotate.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
@@ -43,7 +43,7 @@ renormalized.so:	renormalized.c ../loader.c $(DEPS)
 mandelbrot.so:	mandelbrot.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-# no deps, just math
+# no deps, just libs
 crosstrap.so:	crosstrap.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
@@ -59,4 +59,4 @@ clean:
 		mandelbrot.so julia.so escape_count.so mirror.so \
 		rotate.so translate.so scale.so dragon.so levy.so\
 	; do test -e $$spec && rm $$spec \
-	; done || true
+	; done || :

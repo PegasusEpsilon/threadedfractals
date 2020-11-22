@@ -44,6 +44,6 @@ clean:
 		julia.map threaded.map threadless.map \
 		*.o threaded threadless palette render resample tiler \
 	; do test -e $$spec && rm $$spec \
-	; done || true
+	; done || :
 	$(MAKE) clean -C modules
 	$(MAKE) clean -C pngify

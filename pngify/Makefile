@@ -20,4 +20,4 @@ pngify32:	pngify32.c ../utils.o
 	$(CC) -I.. $(CFLAGS) $^ -o $@ -lz
 
 clean:
-	rm pngify
+	rm pngify || :
