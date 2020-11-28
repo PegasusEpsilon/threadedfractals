@@ -1,4 +1,4 @@
-/* zlib-only PNG24 writer
+/* zlib-only PNG writer
  * by Pegasus Epsilon <pegasus@pimpninjas.org>
  * (C) 2012-2017 Distribute Unmodified
  */
