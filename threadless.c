@@ -19,6 +19,7 @@ FLOAT *buffer;
 FILE *output_file;
 long long unsigned next_line = 0;
 struct pixel max;
+char *myself;
 
 __attribute__((hot, always_inline)) static inline
 void display (void) {
@@ -60,7 +61,7 @@ void thread (void) {
 }
 
 __attribute__((cold, noreturn, always_inline)) static inline
-void usage (char *myself) {
+void usage (void) {
 	puts("Unthreaded fractal sampler\n");
 	printf("Usage: %s WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	WIDTH	number of horizontal samples");
@@ -73,8 +74,9 @@ void usage (char *myself) {
 }
 
 int main (int argc, char **argv) {
+	myself = argv[0];
+	if (5 > argc) usage();
 
-	if (5 > argc) usage(argv[0]);
 
 	sample = get_sampler(&argv[4]);
 

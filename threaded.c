@@ -21,6 +21,7 @@
 struct pixel max;
 list output_buffer;
 long long unsigned thread_count, *queue, next_line = 0;
+char *myself;
 
 __attribute__((hot, always_inline)) static inline
 void display (void) {
@@ -98,7 +99,7 @@ static void *thread (void *ptr) {
 }
 
 __attribute__((cold, noreturn, always_inline)) static inline
-void usage (char *myself) {
+void usage (void) {
 	puts("Threaded fractal sampler\n");
 	printf("Usage: %s THREADS WIDTH HEIGHT OUTFILE SAMPLER ARGS\n\n", myself);
 	puts("	THREADS	how many threads to spawn");
@@ -112,8 +113,9 @@ void usage (char *myself) {
 }
 
 int main (int argc, char **argv) {
+	myself = argv[0];
+	if (6 > argc) usage();
 
-	if (6 > argc) usage(argv[0]);
 
 	sample = get_sampler(&argv[5]);
 
