@@ -28,7 +28,7 @@ void init (char **argv) {
 	if (3 > argc) usage(argv[0]);
 	/* convert degrees to rotation matrix and store for later */
 	theta = strtold(argv[1], NULL) * M_PI / 180;
-	theta = COS(theta) + SIN(theta) * I;
+	theta = COS(CREAL(theta)) + SIN(CREAL(theta)) * I;
 	real_sample = (sampler())get_sampler(&argv[2]);
 }
 

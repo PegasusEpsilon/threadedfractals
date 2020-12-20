@@ -60,7 +60,7 @@ void fwrite_chunk (
 	/* CRC does not include the chunk size field */
 	uint32_t crc = htonl(crc32(0, &chunk->type, (size - sizeof(chunk->size))));
 	/* chunk size does not count header */
-	chunk->size = htonl(size - sizeof(struct png_chunk));
+	chunk->size = htonl((uint32_t)(size - sizeof(struct png_chunk)));
 	/* write chunk */
 	fwrite(chunk, size, 1, file);
 	/* write CRC */
@@ -88,8 +88,7 @@ int output (
 
 int main (int argc, char **argv) {
 	FILE *ifile, *ofile;
-	long idat_start, idat_size;
-	uint32_t crc = 0, height, width, scanline;
+	uint32_t idat_start, idat_size, crc = 0, height, width, scanline;
 	uint8_t channels = 3;
 
 	z_stream stream = {
@@ -161,8 +160,8 @@ int main (int argc, char **argv) {
 	if (NULL == (ofile = fopen(argv[4], "w"))) fail(argv[4]);
 
 	/* Process width and height arguments */
-	width = atol(argv[2]);
-	height = atol(argv[3]);
+	width = (uint32_t)atol(argv[2]);
+	height = (uint32_t)atol(argv[3]);
 	scanline = width * channels;
 
 	/* Write the PNG magic */
@@ -180,7 +179,7 @@ int main (int argc, char **argv) {
 	 * First, the size, which we don't yet know, because we haven't
 	 * compressed anything yet -- so we save the offset here...
 	 */
-	idat_size = ftell(ofile);
+	idat_size = (uint32_t)ftell(ofile);
 	/* ...skip it, and come back to fill it in after compression is complete.
 	 * If your platform doesn't support seek past end of file,
 	 * just write (uint32_t)0 instead, overwriting it later as normal.
@@ -191,7 +190,7 @@ int main (int argc, char **argv) {
 	crc_write("IDAT", 4, ofile, &crc);
 
 	/* Start counting IDAT size from here */
-	idat_start = ftell(ofile);
+	idat_start = (uint32_t)ftell(ofile);
 
 	/* Start up zlib stream compressor */
 	if (Z_OK != deflateInit2(&stream, 9, Z_DEFLATED, 15, 9, Z_DEFAULT_STRATEGY))
@@ -210,7 +209,7 @@ int main (int argc, char **argv) {
 			uint32_t left = scanline - j;
 			chunk = left > Z_CHUNK ? Z_CHUNK : left;
 			stream.next_in = input;
-			stream.avail_in = fread(input, 1, chunk, ifile);
+			stream.avail_in = (uInt)fread(input, 1, chunk, ifile);
 			if (ferror(ifile)) fail(argv[1]);
 			output(&stream, Z_NO_FLUSH, ofile, &crc);
 		}
@@ -221,7 +220,7 @@ int main (int argc, char **argv) {
 	deflateEnd(&stream);
 
 	/* calculate IDAT size */
-	idat_start = ftell(ofile) - idat_start;
+	idat_start = (uint32_t)ftell(ofile) - idat_start;
 	debug("IDAT size: %lu (%08x) bytes\n", idat_start, idat_start);
 	idat_start = htonl(idat_start);
 

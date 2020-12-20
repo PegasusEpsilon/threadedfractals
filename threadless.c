@@ -9,11 +9,13 @@
 #include <stdlib.h> 	/* strtold() */
 #include <stdarg.h> 	/* va_list, va_start(), va_end() */
 #include <stdbool.h>	/* bool, true, false */
+#include <errno.h>  	/* errno */
 
 #include "modules/sampler.h"
 #include "loader.h"
 #include "mapper.h"
 #include "types.h"
+#include "utils.h"
 
 FLOAT *buffer;
 FILE *output_file;
@@ -77,14 +79,16 @@ int main (int argc, char **argv) {
 	myself = argv[0];
 	if (5 > argc) usage();
 
+	max.real = safe_strtoull(argv[1], NULL, 0, "WIDTH", &usage);
+	max.imag = safe_strtoull(argv[2], NULL, 0, "HEIGHT", &usage);
 
+	/* run sampler argument checks before creating output file */
 	sample = get_sampler(&argv[4]);
 
-	max.real = atoi(argv[1]);
-	max.imag = atoi(argv[2]);
-	ratio = 1 - (FLOAT)max.imag / max.real * I;
+	/* create output file */
 	output_file = fopen(argv[3], "w");
 
+	ratio = 1 - (FLOAT)max.imag / max.real * I;
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &ratio);
 

@@ -31,11 +31,12 @@ void display (void) {
 		printf("%llu, ", queue[i]);
 	/* progress */
 	printf("P: %llu/%llu (%0.2f%%), ", next_line, max.imag,
-		100 * (float)next_line / max.imag);
+		100 * (float)next_line / (float)max.imag);
 	/* buffer */
 	long long unsigned used = list_used(output_buffer);
 	long long unsigned length = list_length(output_buffer);
-	printf("B: %llu/%llu (%0.2f%%)\x1b[K\r", used, length, 100 * (float)used / length);
+	printf("B: %llu/%llu (%0.2f%%)\x1b[K\r", used, length,
+		100 * (float)used / (float)length);
 	fflush(stdout);
 }
 
@@ -54,7 +55,7 @@ long long unsigned output (list_buffer *line) {
 	if (next_line == max.imag) {
 		/* no work left */
 		pthread_mutex_unlock(&write_lock);
-		return -1;
+		return (long long unsigned)-1;
 	}
 
 	*line = list_get_write_ptr(output_buffer);
@@ -116,15 +117,18 @@ int main (int argc, char **argv) {
 	myself = argv[0];
 	if (6 > argc) usage();
 
+	thread_count = safe_strtoull(argv[1], NULL, 0, "THREADS", &usage);
+	max.real = safe_strtoull(argv[2], NULL, 0, "WIDTH", &usage);
+	max.imag = safe_strtoull(argv[3], NULL, 0, "HEIGHT", &usage);
 
+	/* run sampler argument checks before creating the output file */
 	sample = get_sampler(&argv[5]);
 
-	thread_count = atoi(argv[1]);
-	max.real = atoi(argv[2]);
-	max.imag = atoi(argv[3]);
+	/* create the output file */
+	output_file = fopen(argv[4], "w");
+
 	/* reverse vertical axis so positive = up */
 	ratio = 1 - (FLOAT)max.imag / max.real * I;
-	output_file = fopen(argv[4], "w");
 
 	/* cache some math */
 	pixelsize = calculate_pixelsize(&max, &ratio);

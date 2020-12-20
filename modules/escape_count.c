@@ -44,7 +44,7 @@ void init (const char *restrict const *restrict const argv) {
 __attribute__((hot))
 FLOAT sample (COMPLEX *const z_ptr, COMPLEX *const c_ptr) {
 	COMPLEX z = *z_ptr, c = *c_ptr;
-	COMPLEX oz = (unsigned long long)-1 + (unsigned long long)-1 * I;
+	COMPLEX oz = 0 + 0 * I;
 	unsigned i, deadline = 1;
 
 	if (inset(c)) return -1;

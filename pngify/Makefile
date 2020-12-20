@@ -1,5 +1,5 @@
 CC=cc
-FLAGS=-Ofast -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99 -g
+FLAGS=-Ofast -Wall -Wextra -Wshadow -Wconversion -Werror -ansi -pedantic -std=c99 -g
 
 ifeq ($(shell uname),Darwin)
 	CFLAGS=$(FLAGS)

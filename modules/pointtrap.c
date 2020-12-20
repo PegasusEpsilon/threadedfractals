@@ -6,6 +6,7 @@
 #include <stdbool.h>	/* bool */
 
 #include "types.h"
+#include "utils.h"
 
 #define ESCAPE 16
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
@@ -27,13 +28,13 @@ void usage (void) {
 
 __attribute__((cold))
 void init (char **argv) {
-	/* count args */
 	myself = argv[0];
+	/* FIXME: ABI change - count args */
 	int argc = 0;
 	while (argv[++argc]);
-	trap.range = strtold(argv[1], NULL);
-	trap.start = atoi(argv[2]);
 	if (3 > argc) usage();
+	trap.range = safe_strtold(argv[1], NULL, "RANGE", &usage);
+	trap.start = safe_strtoui(argv[2], NULL, 0, "START", &usage);
 }
 
 __attribute__((hot, pure))

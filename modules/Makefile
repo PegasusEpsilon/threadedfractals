@@ -1,4 +1,4 @@
-FLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Werror -ansi -pedantic -std=c99
+FLAGS=-Ofast -I.. -Wall -Wextra -Wconversion -Wshadow -Werror -ansi -pedantic -std=c99
 DEPS=../utils.c
 
 ifeq ($(shell uname),Darwin)

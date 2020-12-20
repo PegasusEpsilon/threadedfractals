@@ -6,7 +6,8 @@
 
 #include "config.h"
 #include "types.h"
-#include "constants.h" /* M_PI */
+#include "constants.h"	/* M_PI */
+#include "utils.h"  	/* strtoui() */
 
 #define ESCAPE 16
 #define   likely(x) __builtin_expect(x, true )	/* branch prediction */
@@ -29,14 +30,14 @@ void usage (void) {
 
 __attribute__((cold))
 void init (char **argv) {
-	/* count args */
 	myself = argv[0];
+	/* FIXME: ABI change - count args */
 	int argc = 0;
 	while (argv[++argc]);
-	trap.range = strtold(argv[1], NULL);
-	trap.start = atoi(argv[2]);
-	trap.theta = M_PI * strtold(argv[3], NULL) / 180;
 	if (4 > argc) usage();
+	trap.range = safe_strtold(argv[1], NULL, "RANGE", &usage);
+	trap.start = safe_strtoui(argv[2], NULL, 0, "START", &usage);
+	trap.theta = M_PI * safe_strtold(argv[3], NULL, "ANGLE", &usage) / 180;
 	trap.sin = SIN(trap.theta);
 	trap.cos = COS(trap.theta);
 	trap.hyp = SQRT(trap.sin * trap.sin + trap.cos * trap.cos);
