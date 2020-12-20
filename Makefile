@@ -17,7 +17,7 @@ resample:	resample.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 render:	render.c utils.o
-	$(CC) $(CFLAGS) $^ -o $@ -lm
+	$(CC) $(CFLAGS) $^ -o $@ -lm -lquadmath
 
 palette:	palette.c utils.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm

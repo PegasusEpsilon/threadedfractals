@@ -38,15 +38,21 @@ rotate.so:	rotate.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
 renormalized.so:	renormalized.c ../loader.c $(DEPS)
-	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm -lquadmath
 
 mandelbrot.so:	mandelbrot.c ../loader.c $(DEPS)
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@
 
-# no deps, just libs
-crosstrap.so:	crosstrap.c
-	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
+escape_count.so:	escape_count.c ../loader.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lquadmath
 
+crosstrap.so:	crosstrap.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm -lquadmath
+
+pointtrap.so:	pointtrap.c $(DEPS)
+	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm -lquadmath
+
+# no deps, just libs
 dragon.so:	dragon.c
 	$(CC) $(CFLAGS) -fPIC -shared $^ -o $@ -lm
 
