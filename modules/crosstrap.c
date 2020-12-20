@@ -46,7 +46,7 @@ FLOAT sample (COMPLEX *z_ptr, COMPLEX *c_ptr) {
 	COMPLEX z = *z_ptr, c = *c_ptr;
 	COMPLEX oz = 255 + 255 * I;
 	unsigned i, deadline = 1;
-	FLOAT d = (FLOAT)((unsigned long long)-1);
+	FLOAT d = (FLOAT)((long long unsigned)-1);
 
 	for (i = 0; likely(i != (unsigned)-1); i++) {
 		if (unlikely(CABS(z) > ESCAPE)) break;

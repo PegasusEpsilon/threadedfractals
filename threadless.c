@@ -17,7 +17,7 @@
 
 FLOAT *buffer;
 FILE *output_file;
-unsigned long long next_line = 0;
+long long unsigned next_line = 0;
 struct pixel max;
 
 __attribute__((hot, always_inline)) static inline

@@ -20,15 +20,15 @@ struct node {
 struct list {
 	struct node *read;
 	struct node *write;
-	unsigned long long length;
-	unsigned long long used;
+	long long unsigned length;
+	long long unsigned used;
 };
 
-unsigned long long list_used (struct list *restrict const this) {
+long long unsigned list_used (struct list *restrict const this) {
 	return this->used;
 }
 
-unsigned long long list_length (struct list *restrict const this) {
+long long unsigned list_length (struct list *restrict const this) {
 	return this->length;
 }
 
@@ -103,7 +103,7 @@ struct node *list_get_write_ptr (struct list *restrict const this) {
 	return new;
 }
 
-struct list *new_list (unsigned long long length) {
+struct list *new_list (long long unsigned length) {
 	// allocate a new list
 	struct list *this = new(struct list);
 	// create the initial loop

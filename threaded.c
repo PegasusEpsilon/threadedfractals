@@ -20,20 +20,20 @@
 
 struct pixel max;
 list output_buffer;
-unsigned long long thread_count, *queue, next_line = 0;
+long long unsigned thread_count, *queue, next_line = 0;
 
 __attribute__((hot, always_inline)) static inline
 void display (void) {
 	/* queue */
 	printf("Q: ");
-	for (unsigned long long i = 0; i < thread_count; i++)
+	for (long long unsigned i = 0; i < thread_count; i++)
 		printf("%llu, ", queue[i]);
 	/* progress */
 	printf("P: %llu/%llu (%0.2f%%), ", next_line, max.imag,
 		100 * (float)next_line / max.imag);
 	/* buffer */
-	unsigned long long used = list_used(output_buffer);
-	unsigned long long length = list_length(output_buffer);
+	long long unsigned used = list_used(output_buffer);
+	long long unsigned length = list_length(output_buffer);
 	printf("B: %llu/%llu (%0.2f%%)\x1b[K\r", used, length, 100 * (float)used / length);
 	fflush(stdout);
 }
@@ -42,7 +42,7 @@ pthread_mutex_t write_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t data_written = PTHREAD_COND_INITIALIZER;
 FILE *output_file;
 __attribute__((hot, always_inline)) static inline
-unsigned long long output (list_buffer *line) {
+long long unsigned output (list_buffer *line) {
 	pthread_mutex_lock(&write_lock);
 
 	while ((*line = list_read(output_buffer))) {
@@ -62,7 +62,7 @@ unsigned long long output (list_buffer *line) {
 	display();
 
 	/* remember to increment inside the loop, which requires returning a copy */
-	unsigned long long copy = next_line++;
+	long long unsigned copy = next_line++;
 
 	pthread_mutex_unlock(&write_lock);
 
@@ -73,7 +73,7 @@ COMPLEX pixelsize;
 COMPLEX ratio;
 static sampler(sample);
 __attribute__((hot, always_inline)) static inline
-void iterate_line (list_buffer *line, unsigned long long imag) {
+void iterate_line (list_buffer *line, long long unsigned imag) {
 	COMPLEX point;
 	struct pixel this = { .imag = imag };
 
@@ -87,9 +87,9 @@ void iterate_line (list_buffer *line, unsigned long long imag) {
 
 list_buffer *thread_buffers;
 static void *thread (void *ptr) {
-	unsigned long long i = (unsigned long long)ptr;
+	long long unsigned i = (long long unsigned)ptr;
 	list_buffer *line = &thread_buffers[i];
-	while ((unsigned long long)-1 != queue[i]) {
+	while ((long long unsigned)-1 != queue[i]) {
 		iterate_line(line, queue[i]);
 		queue[i] = output(line);
 	}
@@ -128,7 +128,7 @@ int main (int argc, char **argv) {
 	pixelsize = calculate_pixelsize(&max, &ratio);
 
 	/* allocate process tracking space */
-	queue = new(unsigned long long [thread_count]);
+	queue = new(long long unsigned [thread_count]);
 	pthread_t *threads = new(pthread_t[thread_count]);
 
 	printf("spinning up %llu threads\n", thread_count);
@@ -138,7 +138,7 @@ int main (int argc, char **argv) {
 	thread_buffers = new(list_buffer[thread_count]);
 
 	next_line = thread_count;
-	for (unsigned long long i = 0; i < thread_count; i++) {
+	for (long long unsigned i = 0; i < thread_count; i++) {
 		thread_buffers[i] = list_get_write_ptr(output_buffer);
 		*(thread_buffers[i]) = new(line_t);
 		queue[i] = i;
@@ -146,7 +146,7 @@ int main (int argc, char **argv) {
 	}
 	display();
 
-	for (unsigned long long i = 0; i < thread_count; i++)
+	for (long long unsigned i = 0; i < thread_count; i++)
 		while (pthread_join(threads[i], NULL));
 
 	display();
