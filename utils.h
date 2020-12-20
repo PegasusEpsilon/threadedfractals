@@ -14,11 +14,11 @@ long double safe_strtold (char *ptr, char **endptr, char *name, void(*err_cb)(vo
 
 /* Print errno error message and exit with errorlevel */
 __attribute__((cold, noreturn))
-void fail (const char *restrict const msg);
+void fail (const char *restrict const);
 
 /* Print custom message and exit with errorlevel */
 __attribute__((cold, noreturn))
-void die (const char *restrict const fmt, ...);
+void die (const char *restrict const, ...);
 
 /* debug output system */
 extern int (*debug)(const char *, ...);
