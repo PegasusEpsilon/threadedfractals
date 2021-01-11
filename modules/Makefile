@@ -1,11 +1,10 @@
-FLAGS=-Ofast -I.. -Wall -Wextra -Wconversion -Wshadow -Werror -ansi -pedantic -std=c99
+CFLAGS=-Ofast -I.. -Wall -Wextra -Wshadow -Wconversion -Winline -Werror -ansi -pedantic -std=c99
 DEPS=../utils.c
 
-ifeq ($(shell uname),Darwin)
-	CFLAGS=$(FLAGS)
-else
-	# clang no likey this flag
-	CFLAGS=$(FLAGS) -fmax-errors=3
+ifeq ($(shell $(CC) --version | awk 'NR == 1 { print $$1 }'),clang)
+	CFLAGS += -fsanitize=shift
+else # assume GCC
+	CFLAGS += -fmax-errors=3
 endif
 
 modules:

@@ -1,4 +1,4 @@
-CFLAGS = -Ofast -Wall -Wextra -Wshadow -Wconversion -Werror -ansi -pedantic -std=c99 -g
+CFLAGS = -Ofast -Wall -Wextra -Wshadow -Wconversion -Winline -Werror -ansi -pedantic -std=c99 -g
 
 ifeq ($(shell $(CC) --version | awk 'NR == 1 { print $$1 }'),clang)
 	CFLAGS += -fsanitize=shift
