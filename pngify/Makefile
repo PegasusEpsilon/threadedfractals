@@ -1,22 +1,14 @@
-CC=cc
-FLAGS=-Ofast -Wall -Wextra -Wshadow -Wconversion -Werror -ansi -pedantic -std=c99 -g
+CFLAGS = -Ofast -Wall -Wextra -Wshadow -Wconversion -Werror -ansi -pedantic -std=c99 -g
 
-ifeq ($(shell uname),Darwin)
-	CFLAGS=$(FLAGS)
-else
-	# clang no likey this flag
-	CFLAGS=$(FLAGS) -fmax-errors=3
+ifeq ($(shell $(CC) --version | awk 'NR == 1 { print $$1 }'),clang)
+	CFLAGS += -fsanitize=shift
+else # assume GCC
+	CFLAGS += -fmax-errors=3
 endif
 
 default:	pngify
 
-smush:	smush.c ../utils.o
-	$(CC) -I.. $(CFLAGS) $^ -o $@ -lz
-
 pngify:	pngify.c ../utils.o
-	$(CC) -I.. $(CFLAGS) $^ -o $@ -lz
-
-pngify32:	pngify32.c ../utils.o
 	$(CC) -I.. $(CFLAGS) $^ -o $@ -lz
 
 clean:
